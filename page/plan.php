@@ -12,22 +12,29 @@ include "../auth/checklogin.php";
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <title>Plan</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../assets/css/styles.min.css" />
+    <!-- <link rel="stylesheet" href="../assets/css/main.css"> -->
 
 
 </head>
 
 <body>
-    <div class="container">
+<div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full" data-sidebar-position="fixed" data-header-position="fixed">
         <?php
-        $currentPage = 'plan';
-        include "../component/navbar.php";
+         $currentPage = 'plan';
+        include '../component/aside.php';
+
         ?>
+        <div class="body-wrapper">
+            <?php
+            include "../component/navbar.php";
+            ?>
+    <div class="container-fluid">
         <div class="row mb-3">
             <div class="col-md-12"> <br>
                 <div class="row">
                     <div class="col-6 ">
-                        <h3>แผนงานของฉัน <?php if ($_SESSION['role'] != 3) { ?> <a href="member_formAdd.php" class="btn btn-info">+เพิ่มข้อมูล</a> <?php } ?> </h3>
+                        <h3>แผนงานของฉัน <?php if ($_SESSION['role'] != 3) { ?> <a style="font-size: 14px;" href="member_formAdd.php" class="btn btn-info">+เพิ่มข้อมูล</a> <?php } ?> </h3>
                     </div>
                     <div class="col-6 d-flex justify-content-end">
                         <div>
@@ -61,7 +68,7 @@ include "../auth/checklogin.php";
                             </button>
                         </div>
 
-                        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.min.js"></script>
+                        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.min.js"></script> -->
                     </div>
                 </div>
             </div>
@@ -94,7 +101,7 @@ include "../auth/checklogin.php";
                                 <li class="material-symbols-outlined dropdown " id="dropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     more_horiz
 
-                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                    <ul  class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                                         <li><a class="dropdown-item" href="#">แก้ไขชื่อ</a></li>
                                         <li><a class="dropdown-item" href="#">ลบ</a></li>
                                     </ul>
@@ -133,7 +140,7 @@ include "../auth/checklogin.php";
 
 
         </div>
-
+    </div>
 
 
     </div>
@@ -148,7 +155,7 @@ include "../auth/checklogin.php";
         }
    
 
-
+/* 
         .dropdown:hover>.dropdown-menu,
         .dropend:hover>.dropdown-menu{
             display: block;
@@ -162,7 +169,250 @@ include "../auth/checklogin.php";
                 top: 0;
                 left: 100%;
             }
-        }
-    </style>
+        } */
+        
+.container-fluid .projectCard {
+    position: relative;
+    max-width: 370px;
+    width: 100%;
+    height: 300px;
+    border: none !important;
+    background-color: rgba(255, 255, 255, 1);
+    backdrop-filter: blur(5px);
+    border-radius: 20px;
+    box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: column;
+    grid-row: 1 / 4;
+    margin: 10px;
+}
 
+.container-fluid  .projectCard .projectTop {
+    position: relative;
+    width: 100%;
+    height: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.container-fluid  .projectCard .projectTop h2 {
+    color: #000;
+    font-size: 1.2em;
+    line-height: 18px;
+    cursor: pointer;
+}
+
+.container-fluid  .projectCard .projectTop h2:hover {
+    color : #0D6EFD
+}
+
+.container-fluid  .projectCard .projectTop h2 span {
+    color: #999;
+    font-size: 0.8em;
+}
+
+.container-fluid  .projectCard .projectTop .projectDots {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+/* ตรวจสอบว่าไม่มีข้อความหรือ comment ที่ทำให้มีปัญหา */
+.container-fluid .projectCard .projectTop .projectDots li {
+    color: #000;
+    font-size: 1.8em;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.container-fluid .projectCard .projectTop .projectDots li:hover {
+    color: red;
+}
+
+
+.container-fluid .projectCard .projectTop .projectDots ul .dropdown-item {
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+
+
+.container-fluid  .projectCard .projectProgress {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.container-fluid  .projectCard .projectProgress .process {
+    position: relative;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.container-fluid  .projectCard .projectProgress .process h2 {
+    color: #8389f9;
+    white-space: nowrap;
+    font-size: 1em;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+.container-fluid  .projectCard .projectProgress .priority {
+    position: relative;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+/* .container-fluid  .projectCard .projectProgress .priority::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 8px;
+    height: 8px;
+    transform: translate(-50%, -50%);
+    background: #ff0000;
+    border-radius: 50%;
+    box-shadow: 0 0 2px #ff0000,
+        0 0 5px #ff000077;
+} */
+
+.container-fluid  .projectCard .projectProgress .priority h2 {
+
+    white-space: nowrap;
+    font-size: 1em;
+    font-weight: 500;
+}
+
+.container-fluid  .projectCard .task {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-direction: column;
+    margin: 10px 0;
+}
+
+.container-fluid  .projectCard .task h2 {
+    color: #999;
+    font-size: 1em;
+}
+
+.container-fluid  .projectCard .task h2 bold {
+    color: #000;
+}
+.container-fluid  .projectCard .task .line {
+    position: relative;
+    width: 100%;
+    height: 5px;
+    background: rgba(0, 0, 0, .1);
+    border-radius: 50px;
+    z-index: -1;
+    overflow: hidden;
+}
+.container-fluid  .projectCard .task .line::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    width: calc(100% - 25%);
+    height: 100%;
+    background: #6577ff;
+    z-index: 1;
+    border-radius: 50px;
+}
+
+.container-fluid  .projectCard .due {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    cursor: pointer;
+}
+
+.container-fluid  .projectCard .due h2 {
+    padding: 0px 10px;
+    border: 2px solid #f5b5f5;
+    border-radius: 5px;
+    font-size: 1.1em;
+    color: #f5b5f5;
+}
+
+
+.container-fluid  .projectCard.projectCard2 {
+    grid-row: 4 / 7;
+}
+
+/* .container-fluid  .projectCard.projectCard2 .projectProgress .priority::before {
+    background: #69bc72;
+    box-shadow: 0 0 2px #69bc72,
+        0 0 5px #69bc7277;
+}
+.container-fluid .projectCard.projectCard2 .projectProgress .priority h2 {
+    color: #69bc72;
+} */
+
+
+.container-fluid  .projectCard.projectCard2 .task .line::before {
+    background: #f5c75f;
+}
+
+.container-fluid  .projectCard.projectCard2 .messagesUser {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+}
+
+
+.container-fluid  .projectCard.projectCard2 .messagesUser .messagesUserImg {
+    position: relative;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+.container-fluid  .projectCard.projectCard2 .messagesUser .messagesUserImg img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+.container-fluid  .projectCard.projectCard2 .messagesUser h2 {
+    position: relative;
+    color: #000;
+    cursor: pointer;
+    font-size: 1.2em;
+    line-height: 18px;
+}
+
+.container-fluid  .projectCard.projectCard2 .messagesUser h2 span {
+    color: #999;
+    font-size: 0.8em;
+}
+    </style>
+<script src="../assets/libs/jquery/dist/jquery.min.js"></script>
+    <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/sidebarmenu.js"></script>
+    <script src="../assets/js/app.min.js"></script>
+    <script src="../assets/libs/apexcharts/dist/apexcharts.min.js"></script>
+    <script src="../assets/libs/simplebar/dist/simplebar.js"></script>
+    <script src="../assets/js/dashboard.js"></script>
 </body>

@@ -12,6 +12,7 @@ include "../auth/checklogin.php";
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <title>Member</title>
+    <link rel="stylesheet" href="../assets/css/styles.min.css">
     <style>
         body {
             color: #000;
@@ -24,7 +25,7 @@ include "../auth/checklogin.php";
 
         .card {
             padding: 30px 40px;
-            margin-top: 60px;
+            margin-top: 15px;
             margin-bottom: 60px;
             border: none !important;
             box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.2)
@@ -96,10 +97,18 @@ include "../auth/checklogin.php";
 </head>
 
 <body>
-    <div class="container-fluid px-1 mx-auto">
+<div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full" data-sidebar-position="fixed" data-header-position="fixed">
         <?php
-        $currentPage = 'member';
-        include "../component/navbar.php";
+         $currentPage = 'member';
+        include '../component/aside.php';
+
+        ?>
+        <div class="body-wrapper">
+            <?php
+            include "../component/navbar.php";
+            ?>
+    <div class="container-fluid ">
+        <?php
         include '../connect.php';
         $con = mysqli_connect($servername, $username, $password, $dbname);
         $sql = "SELECT * FROM roles";
@@ -167,7 +176,8 @@ include "../auth/checklogin.php";
             </div>
         </div>
     </div>
-
+        </div>
+</div>
     <!-- <script>
         function validateForm() {
             var username = document.getElementById('username').value;

@@ -15,11 +15,12 @@ include "../auth/checklogin.php";
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
     <title>Profile</title>
+    <link rel="stylesheet" href="../assets/css/styles.min.css">
     <!------ Include the above in your HEAD tag ---------->
     <style>
         .card {
             padding: 30px 40px;
-            margin-top: 60px;
+            margin-top: 30px;
             margin-bottom: 60px;
             border: none !important;
             box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.1)
@@ -139,11 +140,17 @@ include "../auth/checklogin.php";
 </head>
 
 <body>
-    <div class="container-fluid px-1 mx-auto">
+<div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full" data-sidebar-position="fixed" data-header-position="fixed">
         <?php
-        $currentPage = 'member';
-        include "../component/navbar.php";
+         $currentPage = 'member';
+        include '../component/aside.php';
+
         ?>
+        <div class="body-wrapper">
+            <?php
+            include "../component/navbar.php";
+            ?>
+    <div class="container-fluid ">
         <div class="row d-flex justify-content-center">
             <div class="card">
                 <a class="back" href="member_form.php">
@@ -325,5 +332,7 @@ include "../auth/checklogin.php";
             </div>
         </div>
     </div>
+        </div>
+</div>
 
 </body>

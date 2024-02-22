@@ -17,27 +17,29 @@ else
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <title>Member</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
-
-        body {
-            font-family: 'Roboto', sans-serif;
-        }
-    </style>
+    <link rel="stylesheet" href="../assets/css/styles.min.css">
+    
 </head>
 
 <body>
-    <div class="container">
+<div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full" data-sidebar-position="fixed" data-header-position="fixed">
         <?php
-        $currentPage = 'member';
-        include "../component/navbar.php";
+         $currentPage = 'member';
+        include '../component/aside.php';
+
         ?>
+        <div class="body-wrapper">
+            <?php
+            include "../component/navbar.php";
+            ?>
+    <div class="container-fluid">
+     
         <div class="row">
             <div class="col-md-12"> <br>
                 <div class="row">
                     <div class="col-6">
                 
-                        <h3>รายการสมาชิก <?php if ($_SESSION['role'] != 3) { ?> <a href="member_formAdd.php" class="btn btn-info">+เพิ่มข้อมูล</a> <?php } ?> </h3>
+                        <h3>รายการสมาชิก <?php if ($_SESSION['role'] != 3) { ?> <a style="font-size: 14px;" href="member_formAdd.php" class="btn btn-info">+เพิ่มข้อมูล</a> <?php } ?> </h3>
                     </div>
                     <div class="col-6 d-flex justify-content-end">
                         <form action="member_form.php" method="get" class="d-flex">
@@ -118,7 +120,8 @@ else
         
 
     </div>
-    
+        </div>
+</div>
     <script src="bootstrap/js/bootstrap.min.js"></script>
 </body>
 

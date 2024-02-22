@@ -1,4 +1,4 @@
-.container  .myTasks {
+.page-wrapper .body-wrapper .container-fluid .myTasks {
     position: relative;
     max-width: 600px;
     border: none !important;
@@ -19,7 +19,7 @@
 
 
 
-.container  .myTasks .tasksHead {
+.page-wrapper .body-wrapper .container-fluid  .myTasks .tasksHead {
     position: relative;
     width: 100%;
     height: 30px;
@@ -28,7 +28,7 @@
     align-items: flex-start;
 }
 
-.container  .myTasks .tasksHead h2 {
+.page-wrapper .body-wrapper .container-fluid  .myTasks .tasksHead h2 {
     position: relative;
     width: 100%;
     height: 100%;
@@ -38,30 +38,30 @@
     cursor: pointer;
 }
 
-.container  .myTasks .tasksHead .tasksDots {
+.page-wrapper .body-wrapper .container-fluid  .myTasks .tasksHead .tasksDots {
     position: relative;
     cursor: pointer;
 }
 
-.container  .myTasks .tasksHead .tasksDots span {
+.page-wrapper .body-wrapper .container-fluid  .myTasks .tasksHead .tasksDots span {
     color: #000;
     font-size: 1.8em;
     font-weight: 700;
 }
 
-.container  .myTasks .tasks {
+.page-wrapper .body-wrapper .container-fluid  .myTasks .tasks {
     position: relative;
     width: 100%;
     height: 100%;
 }
 
-.container  .myTasks .tasks ul {
+.page-wrapper .body-wrapper .container-fluid  .myTasks .tasks ul {
     position: relative;
     width: 100%;
     height: 100%;
 }
 
-.container  .myTasks .tasks ul li {
+.page-wrapper .body-wrapper .container-fluid  .myTasks .tasks ul li {
     position: relative;
     width: 100%;
     height: 40px;
@@ -70,7 +70,7 @@
     align-items: center;
 }
 
-.container  .myTasks .tasks ul li::before {
+.page-wrapper .body-wrapper .container-fluid  .myTasks .tasks ul li::before {
     content: '';
     position: absolute;
     bottom: 0;
@@ -80,11 +80,11 @@
     background: rgba(0, 0, 0, .1);
 }
 
-.container  .myTasks .tasks ul li:last-child::before {
+.page-wrapper .body-wrapper .container-fluid .myTasks .tasks ul li:last-child::before {
     width: 0;
 }
 
-.container  .myTasks .tasks ul li .tasksIconName {
+.page-wrapper .body-wrapper .container-fluid .myTasks .tasks ul li .tasksIconName {
     position: relative;
     width: 100%;
     height: 100%;
@@ -94,7 +94,7 @@
     gap: 20px;
 }
 
-.container  .myTasks .tasks ul li .tasksIconName .tasksIcon {
+.page-wrapper .body-wrapper .container-fluid  .myTasks .tasks ul li .tasksIconName .tasksIcon {
     position: relative;
     width: 25px;
     height: 25px;
@@ -105,28 +105,28 @@
     cursor: pointer;
 }
 
-.container  .myTasks .tasks ul li .tasksIconName .tasksIcon.done {
+.page-wrapper .body-wrapper .container-fluid  .myTasks .tasks ul li .tasksIconName .tasksIcon.done {
     color: #fff;
     background: #69bc72;
 }
 
-.container  .myTasks .tasks ul li .tasksIconName .tasksIcon.notDone {
+.page-wrapper .body-wrapper .container-fluid   .myTasks .tasks ul li .tasksIconName .tasksIcon.notDone {
     background: #fff;
     border: 3px solid #999;
 }
 
-.container  .myTasks .tasks ul li .tasksIconName .tasksName {
+.page-wrapper .body-wrapper .container-fluid   .myTasks .tasks ul li .tasksIconName .tasksName {
     position: relative;
     color: #000;
     cursor: pointer;
 }
 
-.container  .myTasks .tasks ul li .tasksIconName .tasksName.tasksLine {
+.page-wrapper .body-wrapper .container-fluid   .myTasks .tasks ul li .tasksIconName .tasksName.tasksLine {
     color: #999;
     cursor: not-allowed;
 }
 
-.container  .myTasks .tasks ul li .tasksIconName .tasksName.tasksLine::before {
+.page-wrapper .body-wrapper .container-fluid   .myTasks .tasks ul li .tasksIconName .tasksName.tasksLine::before {
     content: '';
     position: absolute;
     top: 50%;
@@ -136,7 +136,7 @@
     background: rgba(0, 0, 0, .3);
 }
 
-.container  .myTasks .tasks ul li .tasksStar {
+.page-wrapper .body-wrapper .container-fluid   .myTasks .tasks ul li .tasksStar {
     position: relative;
     display: flex;
     justify-content: center;
@@ -144,16 +144,16 @@
     cursor: pointer;
 }
 
-.container  .myTasks .tasks ul li .tasksStar.full {
+.page-wrapper .body-wrapper .container-fluid   .myTasks .tasks ul li .tasksStar.full {
     color: #f5c75f;
 }
 
-.container  .myTasks .tasks ul li .tasksStar.half {
+.page-wrapper .body-wrapper .container-fluid   .myTasks .tasks ul li .tasksStar.half {
     color: #f5c75f;
 }
 
 
-.container .projectCard {
+.container-fluid .projectCard {
     position: relative;
     max-width: 400px;
     width: 100%;
@@ -172,7 +172,7 @@
     margin: 10px;
 }
 
-.container  .projectCard .projectTop {
+.container-fluid  .projectCard .projectTop {
     position: relative;
     width: 100%;
     height: 40px;
@@ -181,23 +181,23 @@
     align-items: center;
 }
 
-.container  .projectCard .projectTop h2 {
+.container-fluid  .projectCard .projectTop h2 {
     color: #000;
     font-size: 1.2em;
     line-height: 18px;
     cursor: pointer;
 }
 
-.container  .projectCard .projectTop h2:hover {
+.container-fluid  .projectCard .projectTop h2:hover {
     color : #0D6EFD
 }
 
-.container  .projectCard .projectTop h2 span {
+.container-fluid  .projectCard .projectTop h2 span {
     color: #999;
     font-size: 0.8em;
 }
 
-.container  .projectCard .projectTop .projectDots {
+.container-fluid  .projectCard .projectTop .projectDots {
     position: relative;
     display: flex;
     justify-content: center;
@@ -206,26 +206,26 @@
 }
 
 /* ตรวจสอบว่าไม่มีข้อความหรือ comment ที่ทำให้มีปัญหา */
-.container .projectCard .projectTop .projectDots li {
+.container-fluid .projectCard .projectTop .projectDots li {
     color: #000;
     font-size: 1.8em;
     font-weight: 700;
     text-decoration: none;
 }
 
-.container .projectCard .projectTop .projectDots li:hover {
+.container-fluid .projectCard .projectTop .projectDots li:hover {
     color: red;
 }
 
 
-.container .projectCard .projectTop .projectDots ul .dropdown-item {
+.container-fluid .projectCard .projectTop .projectDots ul .dropdown-item {
     font-size: 1rem;
     font-weight: 400;
 }
 
 
 
-.container  .projectCard .projectProgress {
+.container-fluid  .projectCard .projectProgress {
     position: relative;
     width: 100%;
     height: 100%;
@@ -234,14 +234,14 @@
     align-items: center;
 }
 
-.container  .projectCard .projectProgress .process {
+.container-fluid  .projectCard .projectProgress .process {
     position: relative;
     padding: 5px 10px;
     border-radius: 5px;
     cursor: pointer;
 }
 
-.container  .projectCard .projectProgress .process h2 {
+.container-fluid  .projectCard .projectProgress .process h2 {
     color: #8389f9;
     white-space: nowrap;
     font-size: 1em;
@@ -249,13 +249,13 @@
     letter-spacing: 0.5px;
 }
 
-.container  .projectCard .projectProgress .priority {
+.container-fluid  .projectCard .projectProgress .priority {
     position: relative;
     padding: 5px 10px;
     cursor: pointer;
 }
 
-/* .container  .projectCard .projectProgress .priority::before {
+/* .container-fluid  .projectCard .projectProgress .priority::before {
     content: '';
     position: absolute;
     top: 50%;
@@ -269,14 +269,14 @@
         0 0 5px #ff000077;
 } */
 
-.container  .projectCard .projectProgress .priority h2 {
+.container-fluid  .projectCard .projectProgress .priority h2 {
 
     white-space: nowrap;
     font-size: 1em;
     font-weight: 500;
 }
 
-.container  .projectCard .task {
+.container-fluid  .projectCard .task {
     position: relative;
     width: 100%;
     display: flex;
@@ -286,15 +286,15 @@
     margin: 10px 0;
 }
 
-.container  .projectCard .task h2 {
+.container-fluid  .projectCard .task h2 {
     color: #999;
     font-size: 1em;
 }
 
-.container  .projectCard .task h2 bold {
+.container-fluid  .projectCard .task h2 bold {
     color: #000;
 }
-.container  .projectCard .task .line {
+.container-fluid  .projectCard .task .line {
     position: relative;
     width: 100%;
     height: 5px;
@@ -303,7 +303,7 @@
     z-index: -1;
     overflow: hidden;
 }
-.container  .projectCard .task .line::before {
+.container-fluid  .projectCard .task .line::before {
     content: '';
     position: absolute;
     left: 0;
@@ -314,7 +314,7 @@
     border-radius: 50px;
 }
 
-.container  .projectCard .due {
+.container-fluid  .projectCard .due {
     position: relative;
     width: 100%;
     height: 100%;
@@ -324,7 +324,7 @@
     cursor: pointer;
 }
 
-.container  .projectCard .due h2 {
+.container-fluid  .projectCard .due h2 {
     padding: 0px 10px;
     border: 2px solid #f5b5f5;
     border-radius: 5px;
@@ -333,25 +333,25 @@
 }
 
 
-.container  .projectCard.projectCard2 {
+.container-fluid  .projectCard.projectCard2 {
     grid-row: 4 / 7;
 }
 
-/* .container  .projectCard.projectCard2 .projectProgress .priority::before {
+/* .container-fluid  .projectCard.projectCard2 .projectProgress .priority::before {
     background: #69bc72;
     box-shadow: 0 0 2px #69bc72,
         0 0 5px #69bc7277;
 }
-.container .projectCard.projectCard2 .projectProgress .priority h2 {
+.container-fluid .projectCard.projectCard2 .projectProgress .priority h2 {
     color: #69bc72;
 } */
 
 
-.container  .projectCard.projectCard2 .task .line::before {
+.container-fluid  .projectCard.projectCard2 .task .line::before {
     background: #f5c75f;
 }
 
-.container  .projectCard.projectCard2 .messagesUser {
+.container-fluid  .projectCard.projectCard2 .messagesUser {
     position: relative;
     width: 100%;
     height: 100%;
@@ -362,14 +362,14 @@
 }
 
 
-.container  .projectCard.projectCard2 .messagesUser .messagesUserImg {
+.container-fluid  .projectCard.projectCard2 .messagesUser .messagesUserImg {
     position: relative;
     width: 50px;
     height: 50px;
     border-radius: 50%;
     overflow: hidden;
 }
-.container  .projectCard.projectCard2 .messagesUser .messagesUserImg img {
+.container-fluid  .projectCard.projectCard2 .messagesUser .messagesUserImg img {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -377,7 +377,7 @@
     cursor: pointer;
 }
 
-.container  .projectCard.projectCard2 .messagesUser h2 {
+.container-fluid  .projectCard.projectCard2 .messagesUser h2 {
     position: relative;
     color: #000;
     cursor: pointer;
@@ -385,7 +385,7 @@
     line-height: 18px;
 }
 
-.container  .projectCard.projectCard2 .messagesUser h2 span {
+.container-fluid  .projectCard.projectCard2 .messagesUser h2 span {
     color: #999;
     font-size: 0.8em;
 }
