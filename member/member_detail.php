@@ -207,7 +207,7 @@ include "../auth/checklogin.php";
                                     <?= $row['firstname'] . ' ' . $row['surname']; ?>
                                 </h5>
                                 <h6>
-                                    Full Stack Web Developer
+                                สาขา <!--    Full Stack Web Developer -->
                                 </h6>
                                 <p class="proile-rating">RANKINGS : <span>8/10</span></p>
                                 <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -334,5 +334,11 @@ include "../auth/checklogin.php";
     </div>
         </div>
 </div>
-
+<script src="../assets/libs/jquery/dist/jquery.min.js"></script>
+    <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/sidebarmenu.js"></script>
+    <script src="../assets/js/app.min.js"></script>
+    <script src="../assets/libs/apexcharts/dist/apexcharts.min.js"></script>
+    <script src="../assets/libs/simplebar/dist/simplebar.js"></script>
+    <script src="../assets/js/dashboard.js"></script>
 </body>

@@ -12,7 +12,7 @@ if(isset($_GET['id'])) {
  if(!$conn)
  { die("error".mysqli_connect_error()); }
 
- $sql = "DELETE FROM user_auth WHERE userId='$delete_id'";
+ $sql = "DELETE FROM project WHERE project_id ='$delete_id'";
  if(mysqli_query($conn,$sql)) {
     echo '<script>
     setTimeout(function() {
@@ -21,7 +21,7 @@ if(isset($_GET['id'])) {
             text: "Delete successful",
             type: "success",
         }, function() {
-            window.location = "../page/plan.php"; //หน้าที่ต้องการให้กระโดดไป
+            window.location = "member_form.php"; //หน้าที่ต้องการให้กระโดดไป
         });
     }, 1000);
     </script>';
@@ -33,7 +33,7 @@ if(isset($_GET['id'])) {
                 text: "ไม่สามารถลบได้",
                 type: "warning"
             }, function() {
-                window.location = "../page/plan.php"; //หน้าที่ต้องการให้กระโดดไป
+                window.location = "member_form.php"; //หน้าที่ต้องการให้กระโดดไป
             });
         }, 1000);
         </script>';

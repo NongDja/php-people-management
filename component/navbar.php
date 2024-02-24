@@ -1,6 +1,5 @@
 
 <body>
-
     <header class="app-header">
         <nav class="navbar navbar-expand-lg navbar-light">
             <ul class="navbar-nav">
@@ -9,12 +8,7 @@
                         <i class="ti ti-menu-2"></i>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link nav-icon-hover" href="javascript:void(0)">
-                        <i class="ti ti-bell-ringing"></i>
-                        <div class="notification bg-primary rounded-circle"></div>
-                    </a>
-                </li>
+               
             </ul>
             <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
                 <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-end">
@@ -24,7 +18,7 @@
                     ?>
                         <li class="nav-item dropdown">
                         <a class="nav-link nav-icon-hover" href="javascript:void(0)" id="drop2" data-bs-toggle="dropdown" aria-expanded="false">
-                            <img src="data:image/jpeg;base64,<?= base64_encode($_SESSION["image_data"]) ?>" alt="" width="50" height="50" class="rounded-circle">
+                            <img style="object-fit: cover;" src="data:image/jpeg;base64,<?= base64_encode($_SESSION["image_data"]) ?>" alt="" width="50" height="50"   class="rounded-circle">
                         </a>
                         <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop2">
                             <div class="message-body">
@@ -48,8 +42,10 @@
                         </div>
                     </li>
                     
-
-                        <?php } ?>
+                
+                        <?php } else {?>
+                            <a href="../auth/login.php" class="btn btn-outline-primary mx-3 mt-2 d-block">Login</a>
+                            <?php   } ?>
                         </li>
                             
                    
@@ -64,9 +60,7 @@
   <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../assets/js/sidebarmenu.js"></script>
   <script src="../assets/js/app.min.js"></script>
-  <script src="../assets/libs/apexcharts/dist/apexcharts.min.js"></script>
-  <script src="../assets/libs/simplebar/dist/simplebar.js"></script>
-  <script src="../assets/js/dashboard.js"></script>
+
     </header>
 
 </body>
