@@ -393,13 +393,13 @@ include "../auth/checklogin.php";
                     $id = $_SESSION["userId"];
                     $con = mysqli_connect($servername, $username, $password, $dbname);
                     if ($_SESSION['role'] != 3) {
-                        $sql = "SELECT project.project_id, 
-                        (SELECT COUNT(DISTINCT project_user.project_id) FROM project_user) AS projectCount, 
-                        project.*
-                 FROM project 
-                 JOIN project_user ON project_user.project_id = project.project_id
-                 JOIN members ON members.id = project_user.user_id
-                 GROUP BY project.project_id, members.image_data, members.firstname, members.surname;
+                        $sql = "SELECT DISTINCT project.project_id, 
+                (SELECT COUNT(DISTINCT project_user.project_id) FROM project_user) AS projectCount, 
+                project.*
+FROM project 
+JOIN project_user ON project_user.project_id = project.project_id
+JOIN members ON members.id = project_user.user_id;
+
                  ";
                     } else {
                         $sql = "SELECT project.*,members.image_data, members.firstname, members.surname FROM project LEFT JOIN members ON members.id = project.user_id JOIN project_user ON user_auth.userId = project_user.user_id
@@ -410,41 +410,34 @@ include "../auth/checklogin.php";
                     $stmt->execute();
                     mysqli_stmt_execute($stmt);
                     $result = mysqli_stmt_get_result($stmt);
-                    while ($project = mysqli_fetch_assoc($result)) {
-                        $projectId = $project['project_id'];
-                        $projectLevel = $project['level'];
-                        $projectStatus = $project['status'];
-                        $projectCount = $project['projectCount'];
-                        $projectName = $project['project_name'];
-                        // $projectDescription = $row['project_description'];
-                        // $imageData = $project['image_data'];
-                        // $firstname = $project['firstname'];
-                        // $surname = $project['surname'];
-                        $projectDate = $project['deadline'];
-                        // Perform further actions as needed
-                        echo "Project ID: $projectId, Project Count: $projectCount, Project Name: $projectName";
-                        $userQuery = "SELECT members.image_data FROM members 
-                        JOIN project_user ON members.id = project_user.user_id
-                        WHERE project_user.project_id = ?";
-                        $userStmt = mysqli_prepare($con, $userQuery);
-                        mysqli_stmt_bind_param($userStmt, "i", $projectId);
-                        mysqli_stmt_execute($userStmt);
-                        $userResult = mysqli_stmt_get_result($userStmt);
-                    }
+
+
                     if (mysqli_num_rows($result) > 0) {
-                        $i = 1;
-                        while ($i <= $projectCount) {
-                            $i++;
+                        while ($project = mysqli_fetch_assoc($result)) {
+                            $projectId = $project['project_id'];
+                            $projectLevel = $project['level'];
+                            $projectStatus = $project['status'];
+                            $projectCount = $project['projectCount'];
+                            $projectName = $project['project_name'];
+                            // $projectDescription = $row['project_description'];
+                            // $imageData = $project['image_data'];
+                            // $firstname = $project['firstname'];
+                            // $surname = $project['surname'];
+                            $projectDate = $project['deadline'];
+                            // Perform further actions as needed
+                            // echo "Project ID: $projectId, Project Count: $projectCount, Project Name: $projectName";
+                            $userQuery = "SELECT members.image_data FROM members 
+                            JOIN project_user ON members.id = project_user.user_id
+                            WHERE project_user.project_id = ?";
+                            $userStmt = mysqli_prepare($con, $userQuery);
+                            mysqli_stmt_bind_param($userStmt, "i", $projectId);
+                            mysqli_stmt_execute($userStmt);
+                            $userResult = mysqli_stmt_get_result($userStmt);
                             $dateTime = new DateTime($projectDate);
                             $formattedDate = $dateTime->format('d F Y'); ?>
                             <div class="projectCard projectCard2">
                                 <div class="projectTop">
-                                <?php
-                                    $j = 1;
-                                    $pic = 0;
-                                    while ($user = mysqli_fetch_assoc($userResult)) { ?>
 
-                                     <?php } ?>
                                     <h2><?php echo $projectName ?><br><span> Name</span></h2>
 
                                     <div class="projectDots">
@@ -500,17 +493,17 @@ include "../auth/checklogin.php";
                                         background: #fff;">
                                         <span class="number">+<?php echo $j - 1; ?></span>
                                     </a>
-                    
+
 
 
 
                                 </div>
                             </div>
-                            <?php }
+                    <?php }
                     } else {
                     }
 
-                            ?>
+                    ?>
                 </div>
                 <script>
                     function confirmDelete(id) {
