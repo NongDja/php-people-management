@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<?php session_start();
+<?php
 include "../auth/checklogin.php";
 ?>
 <html lang="en">
@@ -18,9 +18,7 @@ include "../auth/checklogin.php";
             color: #000;
             overflow-x: hidden;
             height: 100%;
-            ;
-            background-repeat: no-repeat;
-            background-size: 100% 100%
+            background: #fafafa;
         }
 
         .card {

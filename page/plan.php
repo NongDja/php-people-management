@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<?php session_start();
+<?php 
 include "../auth/checklogin.php";
+$userId = $_SESSION['userId']
 ?>
 <html lang="en">
 
@@ -14,8 +15,13 @@ include "../auth/checklogin.php";
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link rel="stylesheet" href="../assets/css/styles.min.css" />
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <!-- <link rel="stylesheet" href="../assets/css/main.css"> -->
     <style>
+        body {
+            background: #fafafa;
+        }
+
         .divider {
             width: 100%;
             height: 1px;
@@ -54,18 +60,18 @@ include "../auth/checklogin.php";
             align-items: center;
         }
 
-        .container-fluid .projectCard .projectTop h2 {
+        .container-fluid .projectCard .projectTop a {
             color: #000;
             font-size: 1.2em;
             line-height: 18px;
             cursor: pointer;
         }
 
-        .container-fluid .projectCard .projectTop h2:hover {
+        .container-fluid .projectCard .projectTop a:hover {
             color: #0D6EFD
         }
 
-        .container-fluid .projectCard .projectTop h2 span {
+        .container-fluid .projectCard .projectTop a span {
             color: #999;
             font-size: 0.8em;
         }
@@ -128,19 +134,7 @@ include "../auth/checklogin.php";
             cursor: pointer;
         }
 
-        /* .container-fluid  .projectCard .projectProgress .priority::before {
-                content: '';
-                position: absolute;
-                top: 50%;
-                left: 0;
-                width: 8px;
-                height: 8px;
-                transform: translate(-50%, -50%);
-                background: #ff0000;
-                border-radius: 50%;
-                box-shadow: 0 0 2px #ff0000,
-                    0 0 5px #ff000077;
-            } */
+
 
         .container-fluid .projectCard .projectProgress .priority h2 {
 
@@ -309,11 +303,7 @@ include "../auth/checklogin.php";
             object-fit: cover;
         }
 
-        .container-fluid .projectCard .groupImg a:last-child {
-            border: 3px solid #999;
-            border-radius: 50%;
-            background: #fff;
-        }
+
 
         .container-fluid .projectCard .groupImg a:last-child span {
             color: #999;
@@ -346,44 +336,24 @@ include "../auth/checklogin.php";
                                         } else {
                                             echo 'แผนงานของฉัน';
                                         } ?> <a style="font-size: 14px;" href="<?php if ($_SESSION['role'] != 3) {
-                                                                                    echo '../plan/plan_add.php';
-                                                                                } else {
-                                                                                    echo './home.php';
-                                                                                } ?>" class="btn btn-info">+เพิ่มข้อมูล</a></h3>
+                                                echo '../plan/plan_add.php';
+                                                } else {
+                                                  echo '../plan/self_add.php';
+                                                } ?>" class="btn btn-info">+เพิ่มข้อมูล</a></h3>
                             </div>
                             <div class="col-6 d-flex justify-content-end">
-                                <!-- <div>
-                                    <button class="nav-item dropdown">
-                                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Sort</a>
 
-                                        <ul class="dropdown-menu">
-                                            <li class="nav-item dropend">
-                                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                    Status
-                                                </a>
-                                                <ul class="dropdown-menu">
-                                                    <li><a class="dropdown-item" href="#">Success</a></li>
-                                                    <li><a class="dropdown-item" href="#">In Progress</a></li>
-                                                    <li><a class="dropdown-item" href="#">Failed</a></li>
-                                                </ul>
-                                            </li>
-                                            <li class="nav-item dropend">
-                                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                    Level
-                                                </a>
-
-                                                <ul class="dropdown-menu">
-                                                    <li><a class="dropdown-item" href="#">Easy</a></li>
-                                                    <li><a class="dropdown-item" href="#">Medium</a></li>
-                                                    <li><a class="dropdown-item" href="#">Hard</a></li>
-
-                                                </ul>
-                                            </li>
-                                        </ul>
+                                <div class="dropdown">
+                                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                        สาขา
                                     </button>
-                                </div> -->
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                        <li><a class="dropdown-item" href="#">Action</a></li>
+                                        <li><a class="dropdown-item" href="#">Another action</a></li>
+                                        <li><a class="dropdown-item" href="#">Something else here</a></li>
+                                    </ul>
+                                </div>
 
-                                <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.min.js"></script> -->
                             </div>
                         </div>
                     </div>
@@ -394,16 +364,16 @@ include "../auth/checklogin.php";
                     $con = mysqli_connect($servername, $username, $password, $dbname);
                     if ($_SESSION['role'] != 3) {
                         $sql = "SELECT DISTINCT project.project_id, 
-                (SELECT COUNT(DISTINCT project_user.project_id) FROM project_user) AS projectCount, 
-                project.*
-FROM project 
-JOIN project_user ON project_user.project_id = project.project_id
-JOIN members ON members.id = project_user.user_id;
-
-                 ";
+                        (SELECT COUNT(DISTINCT project_user.project_id) FROM project_user) AS projectCount, 
+                        project.* FROM project 
+                        JOIN project_user ON project_user.project_id = project.project_id
+                        JOIN members ON members.id = project_user.user_id;";
                     } else {
-                        $sql = "SELECT project.*,members.image_data, members.firstname, members.surname FROM project LEFT JOIN members ON members.id = project.user_id JOIN project_user ON user_auth.userId = project_user.user_id
-                        JOIN project ON project_user.project_id = project.project_id WHERE project_user.user_id = '$id'";
+                        $sql = "SELECT DISTINCT project.project_id, 
+                        (SELECT COUNT(DISTINCT project_user.project_id) FROM project_user WHERE project_user.user_id = '$id') AS projectCount, 
+                        project.* FROM project
+                        JOIN project_user ON project_user.project_id = project.project_id
+                        JOIN members ON members.id = project_user.user_id WHERE project_user.user_id = '$id'";
                     }
 
                     $stmt = mysqli_prepare($con, $sql);
@@ -419,16 +389,16 @@ JOIN members ON members.id = project_user.user_id;
                             $projectStatus = $project['status'];
                             $projectCount = $project['projectCount'];
                             $projectName = $project['project_name'];
-                            // $projectDescription = $row['project_description'];
-                            // $imageData = $project['image_data'];
-                            // $firstname = $project['firstname'];
-                            // $surname = $project['surname'];
+                            $projectDescription = $project['description'];
                             $projectDate = $project['deadline'];
-                            // Perform further actions as needed
-                            // echo "Project ID: $projectId, Project Count: $projectCount, Project Name: $projectName";
-                            $userQuery = "SELECT members.image_data FROM members 
+
+                            $userQuery = "SELECT members.image_data 
+                            FROM members 
                             JOIN project_user ON members.id = project_user.user_id
-                            WHERE project_user.project_id = ?";
+                            WHERE project_user.project_id = ?
+                            ORDER BY 
+                            CASE WHEN project_user.user_id = '$userId' THEN 0 ELSE 1 END,
+                            project_user.user_id;";
                             $userStmt = mysqli_prepare($con, $userQuery);
                             mysqli_stmt_bind_param($userStmt, "i", $projectId);
                             mysqli_stmt_execute($userStmt);
@@ -438,14 +408,15 @@ JOIN members ON members.id = project_user.user_id;
                             <div class="projectCard projectCard2">
                                 <div class="projectTop">
 
-                                    <h2><?php echo $projectName ?><br><span> Name</span></h2>
+                                    <a href="../plan/plan_detail.php?page=<?php echo$projectId ?>"><?php echo $projectName; ?><br><span> <?php echo (strlen($projectDescription) > 30) ? substr($projectDescription, 0, 30) . '...' : $projectDescription; ?></span></a>
+
 
                                     <div class="projectDots">
                                         <li class="material-symbols-outlined dropdown " id="dropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                             more_horiz
 
                                             <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                                <li><a class="dropdown-item" href="#">แก้ไขชื่อ</a></li>
+                                                <li><a class="dropdown-item" href="#">แก้ไข</a></li>
                                                 <li><a class="dropdown-item" onclick="confirmDelete(<?php echo $row['project_id']; ?>)">ลบ</a></li>
                                             </ul>
                                         </li>
@@ -486,15 +457,19 @@ JOIN members ON members.id = project_user.user_id;
                                         </a>";
                                         $j++;
                                         $pic++;
+                                        if ($pic >= 5) {
+                                            break;
+                                        }
                                     }
+                                    if ($j > 5) {
                                     ?>
-                                    <a style="--left: -<?php echo ($j - 1) * 10; ?>px;     border: 3px solid #999;
+                                        <a style="--left: -<?php echo ($j - 1) * 10; ?>px;     border: 3px solid #999;
                                         border-radius: 50%;
                                         background: #fff;">
-                                        <span class="number">+<?php echo $j - 1; ?></span>
-                                    </a>
+                                            <span class="number">+<?php echo $j - 4; ?></span>
+                                        </a>
 
-
+                                    <?php } ?>
 
 
                                 </div>
@@ -524,11 +499,8 @@ JOIN members ON members.id = project_user.user_id;
                     }
                 </script>
 
-                <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
                 <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
                 <script src="../assets/js/sidebarmenu.js"></script>
                 <script src="../assets/js/app.min.js"></script>
-                <script src="../assets/libs/apexcharts/dist/apexcharts.min.js"></script>
                 <script src="../assets/libs/simplebar/dist/simplebar.js"></script>
-                <script src="../assets/js/dashboard.js"></script>
 </body>

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <?php 
 include "../auth/checklogin.php";
+$userId = $_SESSION["userId"];
 ?>
 <html lang="en">
 
@@ -96,7 +97,7 @@ include "../auth/checklogin.php";
 
     <?php if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-if (isset($_POST['plan']) && isset($_POST['level']) && isset($_POST['date']) && isset($_POST['person'])) {
+if (isset($_POST['plan']) && isset($_POST['level']) && isset($_POST['date']) && isset($_POST['description'])) {
     echo '
         <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert-dev.js"></script>
@@ -113,6 +114,7 @@ if (isset($_POST['plan']) && isset($_POST['level']) && isset($_POST['date']) && 
     $level = $_POST['level'];
     $date = $_POST['date'];
     $description = $_POST['description'];
+
     // Insert into project table
     $sql = "INSERT INTO project (project_name, level, deadline,description) VALUES ('$plan', '$level', '$date', '$description')";
     $result = mysqli_query($conn, $sql);
@@ -122,7 +124,7 @@ if (isset($_POST['plan']) && isset($_POST['level']) && isset($_POST['date']) && 
         $lastProjectId = mysqli_insert_id($conn);
 
         // Insert into project_user table for each selected user
-        foreach ($_POST['person'] as $userId) {
+    
             $sqlProjectUser = "INSERT INTO project_user (project_id, user_id) VALUES ('$lastProjectId', '$userId')";
             $resultProjectUser = mysqli_query($conn, $sqlProjectUser);
 
@@ -140,7 +142,6 @@ if (isset($_POST['plan']) && isset($_POST['level']) && isset($_POST['date']) && 
                     </script>';
                 exit(); // Exit the script if any user insertion fails
             }
-        }
 
         echo '<script>
             setTimeout(function() {
@@ -186,11 +187,13 @@ if (isset($_POST['plan']) && isset($_POST['level']) && isset($_POST['date']) && 
                 <?php
                 include '../connect.php';
                 $con = mysqli_connect($servername, $username, $password, $dbname);
-                $sql = "SELECT * FROM members ORDER BY branch_id";
+                $sql = "SELECT * FROM members";
                 $stmt = mysqli_prepare($con, $sql);
                 $stmt->execute();
                 mysqli_stmt_execute($stmt);
                 $result = mysqli_stmt_get_result($stmt);
+
+
                 ?>
                 <div class="row d-flex justify-content-center">
                     <div class="card">
@@ -223,30 +226,16 @@ if (isset($_POST['plan']) && isset($_POST['level']) && isset($_POST['date']) && 
                                 <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">Due Date<span class="text-danger"> *</span></label>
                                     <input type="datetime-local" name="date" placeholder="Select Date">
                                 </div>
-
-                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">บุคลากร<span class="text-danger"> *</span></label>
-
-                                    <select name="person[]" class="form-control js-select2" multiple="multiple">
-                                        <?php
-                                        while ($row = mysqli_fetch_assoc($result)) {
-                                            $rowId = $row['id'];
-                                            $firstname = $row['firstname'];
-                                            $surname = $row['surname'];
-                                            $branch_id = $row['branch_id'];
-                                        ?>
-                                            <option data-badge="" value="<?php echo $rowId; ?>"> <?php echo  '000'.$branch_id. ' ' . $firstname . ' ' . $surname; ?></option>
-                                        <?php } ?>
-
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="row justify-content-between text-left p-4">
-                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ข้อมูลเพิ่มเติม<span class="text-danger"> *</span></label>
-                                    <textarea name="" id="" cols="30" rows="4"></textarea>
-                                </div>
+                                
                                 <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ข้อมูลเพิ่มเติม<span class="text-danger"> *</span></label>
                                     <input type="file" name="" id="">
                                 </div>
+                            </div>
+                            <div class="row justify-content-between text-left p-4">
+                            <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ข้อมูลเพิ่มเติม<span class="text-danger"> *</span></label>
+                                    <textarea name="description" id="description" cols="30" rows="4"></textarea>
+                                </div>
+                               
                             </div>
 
                             <div class="row justify-content-end">

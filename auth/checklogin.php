@@ -22,11 +22,11 @@
 }
 
 
-// include "../session.php"; 
-// if(!isset($_SESSION['username']))
-// {
-//     echo '<meta http-equiv="refresh" content="0;url=../component/404.php">';
-//     exit();
-//   }
+include "../session.php"; 
+if(!isset($_SESSION['userId']))
+{
+    echo '<meta http-equiv="refresh" content="0;url=../component/404.php">';
+    exit();
+  }
 
 ?>

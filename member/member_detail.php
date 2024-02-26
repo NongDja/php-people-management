@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<?php session_start();
+<?php 
 include "../auth/checklogin.php";
 ?>
 <html lang="en">
@@ -18,6 +18,9 @@ include "../auth/checklogin.php";
     <link rel="stylesheet" href="../assets/css/styles.min.css">
     <!------ Include the above in your HEAD tag ---------->
     <style>
+        body{
+            background: #fafafa;
+        }
         .card {
             padding: 30px 40px;
             margin-top: 30px;
@@ -31,8 +34,8 @@ include "../auth/checklogin.php";
         }
 
         .profile-img img {
-            width: 70%;
-            height: 100%;
+            width: 270px;
+            height: 270px;
         }
 
         .profile-img .file {

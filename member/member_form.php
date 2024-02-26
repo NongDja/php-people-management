@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<?php session_start(); 
+<?php 
 include "../auth/checklogin.php";
 if (isset($_GET["search"]))
     $search = $_GET["search"];
@@ -18,7 +18,11 @@ else
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <title>Member</title>
     <link rel="stylesheet" href="../assets/css/styles.min.css">
-    
+    <style>
+          body{
+            background: #fafafa;
+        }
+    </style>
 </head>
 
 <body>
@@ -44,7 +48,7 @@ else
                     <div class="col-6 d-flex justify-content-end">
                         <form action="member_form.php" method="get" class="d-flex">
                             <div class="input-group">
-                                <input type="text" name="search" class="form-control" value="<?php echo $search; ?>">
+                                <input style="background: #fff;" type="text" name="search" class="form-control" value="<?php echo $search; ?>">
                                 <button class="btn btn-sidebar" type="submit">
                                     <i class="fa fa-search"></i>
                                 </button>
@@ -66,21 +70,21 @@ else
                 }
 
                 $start = ($page - 1) * $perpage;
-                $sql = "SELECT * FROM members WHERE members.firstname LIKE '%$search%'
-                OR members.id LIKE '%$search%' limit {$start} , {$perpage}";
+                $sql = "SELECT members.*, branch.branch_name FROM members LEFT JOIN branch ON members.branch_id = branch.branch_id WHERE members.firstname LIKE '%$search%'
+                OR members.id LIKE '%$search%' OR branch.branch_name LIKE '%$search%' limit {$start} , {$perpage}";
                 $stmt = mysqli_prepare($con, $sql);
                 $stmt->execute();
                 mysqli_stmt_execute($stmt);
                 $result = mysqli_stmt_get_result($stmt);
                 foreach ($result as $k) {
                 ?>
-                    <div class="border rounded container-xl mx-auto shadow-sm p-4 my-4">
+                    <div class="border rounded container-xl mx-auto shadow-sm p-4 my-4" style="background: #fff;">
                         <div class="row p-1">
                             <div class="col-2">
-                                <img src="data:image/jpeg;base64,<?= base64_encode($k["image_data"]) ?>" style=" overflow: hidden; max-width: 80px; height: 70px; border:1px solid #000000!important">
+                                <img src="data:image/jpeg;base64,<?= base64_encode($k["image_data"]) ?>" style=" overflow: hidden; object-fit:cover; width: 80px; height: 80px; border:1px solid #000000!important">
                             </div>
                             <div class="col-4 d-flex align-items-center text-capitalize " style="font-weight: bold;"><?= $k['firstname'] . ' ' . $k['surname']; ?></div>
-                            <div class="col-3 d-flex align-items-center">Faculty</div>
+                            <div class="col-3 d-flex align-items-center"><?= $k['branch_name']; ?></div>
                             <div class="col-3 d-flex align-items-center gap-3 <?php  echo ($_SESSION['role'] == 3) ? 'justify-content-center' : ''; ?>">
                                 <a href="member_detail.php?page=<?php echo $k['id']; ?>" type="button" class="btn btn-info"><i class="fa fa-info-circle me-1"></i>Detail</a>
                                 <?php if ($_SESSION['role'] != 3) { ?> <a href="member_formEdit.php?page=<?php echo $k['id']; ?>" type="button" class="btn btn-warning"><i class="fa fa-edit me-1"></i> Edit</a>  <?php } ?> 
