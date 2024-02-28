@@ -33,8 +33,9 @@
             <?php
             include "../component/navbar.php";
             ?>
-            <div class="container-fluid">
-                <!-- <div class="row">
+            <?php if(isset($_SESSION['username']) && $_SESSION['role'] != 3) { ?>
+                <div class="container-fluid">
+                <div class="row">
                     <div class="col-lg-8 d-flex align-items-strech">
                         <div class="card w-100">
                             <div class="card-body">
@@ -58,7 +59,7 @@
                     <div class="col-lg-4">
                         <div class="row">
                             <div class="col-lg-12">
-                            // *    Yearly Breakup 
+                         
                                 <div class="card overflow-hidden">
                                     <div class="card-body p-4">
                                         <h5 class="card-title mb-9 fw-semibold">Yearly Breakup</h5>
@@ -122,7 +123,7 @@
                             </div>
                         </div>
                     </div>
-                </div> -->
+                </div>
 
                 <!-- <div class="myTasks">
                     // ** tasksHead start
@@ -246,6 +247,8 @@
                     // **  tasks ens
                 </div> -->
             </div>
+          <?php  }?>
+          
         </div>
     </div>
 

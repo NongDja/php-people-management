@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <?php
 include "../auth/checklogin.php";
-$userId = $_SESSION["userId"];
 ?>
 <html lang="en">
 
@@ -97,102 +96,77 @@ $userId = $_SESSION["userId"];
 
     <?php if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-        if (isset($_POST['plan']) && isset($_POST['level']) && isset($_POST['date']) && isset($_POST['description'])) {
+        if (isset($_POST['plan']) && isset($_POST['level']) && isset($_POST['date'])) {
             echo '
         <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert-dev.js"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.css">';
-            if (isset($_FILES["pdfFile"])) {
-                // Check if there are no errors during the file upload
-                if ($_FILES["pdfFile"]["error"] == UPLOAD_ERR_OK) {
-                    $pdfFile = $_FILES["pdfFile"]["tmp_name"];
-                    $pdfContent = file_get_contents($pdfFile);
 
-                    // Your other form data
-                    $plan = $_POST['plan'];
-                    $level = $_POST['level'];
-                    $date = $_POST['date'];
-                    $description = $_POST['description'];
+            include "../connect.php";
+            $conn = mysqli_connect($servername, $username, $password, $dbname);
 
-                    // Your database connection code
-                    include "../connect.php";
-                    $conn = mysqli_connect($servername, $username, $password, $dbname);
+            if (!$conn) {
+                die("error" . mysqli_connect_error());
+            }
+            $id = mysqli_real_escape_string($conn, $_GET['page']);
+            $plan = $_POST['plan'];
+            $level = $_POST['level'];
+            $date = $_POST['date'];
+            $description = $_POST['description'];
+            $status = $_POST['status'];
+            $newPdfFile = $_FILES["newPdfFile"]["tmp_name"]; // New file uploaded
+            // Start a transaction for atomicity
+            mysqli_begin_transaction($conn);
 
-                    if (!$conn) {
-                        die("error" . mysqli_connect_error());
+            try {
+                // Update project table
+                if (isset($newPdfFile) && $_FILES["newPdfFile"]["error"] == UPLOAD_ERR_OK) {
+                    $pdfContent = file_get_contents($newPdfFile);
+                    $sqlUpdateProject = "UPDATE project SET project_name = '$plan', level = '$level', deadline = '$date', description = '$description',status = '$status' , pdf_data = '$pdfContent'  WHERE project_id = '$id'";
+                    $resultUpdateProject = mysqli_query($conn, $sqlUpdateProject);
+    
+                    if (!$resultUpdateProject) {
+                        // Rollback the transaction if the update fails
+                        mysqli_rollback($conn);
+                        die('Error updating project: ' . mysqli_error($conn));
                     }
-
-                    // Escape variables to prevent SQL injection
-                    $plan = mysqli_real_escape_string($conn, $plan);
-                    $level = mysqli_real_escape_string($conn, $level);
-                    $date = mysqli_real_escape_string($conn, $date);
-                    $description = mysqli_real_escape_string($conn, $description);
-                    $pdfContent = mysqli_real_escape_string($conn, $pdfContent);
-
-                    // Your SQL query
-                    $sql = "INSERT INTO project (project_name, level, deadline, description, pdf_data) VALUES ('$plan', '$level', '$date', '$description', '$pdfContent')";
-
-                    $result = mysqli_query($conn, $sql);
-                    if ($result) {
-                        $lastProjectId = mysqli_insert_id($conn);
-
-                        // Insert into project_user table for each selected user
-
-                        $sqlProjectUser = "INSERT INTO project_user (project_id, user_id) VALUES ('$lastProjectId', '$userId')";
-                        $resultProjectUser = mysqli_query($conn, $sqlProjectUser);
-
-                        if (!$resultProjectUser) {
-                            echo '<script>
-                                setTimeout(function() {
-                                    swal({
-                                        title: "เกิดข้อผิดพลาด",
-                                        text: "ไม่สามารถบันทึกข้อมูล user_id=' . $userId . ' ได้",
-                                        type: "error"
-                                    }, function() {
-                                        window.location = "../page/plan.php"; //หน้าที่ต้องการให้กระโดดไป
-                                    });
-                                }, 1000);
-                                </script>';
-                            exit(); // Exit the script if any user insertion fails
-                        }
-
-                        echo '<script>
-                        setTimeout(function() {
-                            swal({
-                                title: "บันทึกข้อมูลเรียบร้อย",
-                                text: "บันทึกข้อมูลเรียบร้อยแล้ว",
-                                type: "success"
-                            }, function() {
-                                window.location = "../page/plan.php"; //หน้าที่ต้องการให้กระโดดไป
-                            });
-                        }, 1000);
-                        </script>';
-                    } else {
-                        echo '<script>
-                setTimeout(function() {
-                    swal({
-                        title: "เกิดข้อผิดพลาด",
-                        text: "ไม่สามารถบันทึกข้อมูล project ได้",
-                        type: "error"
-                    }, function() {
-                        window.location = "../page/plan.php"; //หน้าที่ต้องการให้กระโดดไป
-                    });
-                }, 1000);
-                </script>';
-                    }
+    
+    
+                    // Commit the transaction if all queries are successful
+                    mysqli_commit($conn);
                 } else {
-                    echo '<script>
+                    $sqlUpdateProject = "UPDATE project SET project_name = '$plan', level = '$level', deadline = '$date', description = '$description',status = '$status'  WHERE project_id = '$id'";
+                    $resultUpdateProject = mysqli_query($conn, $sqlUpdateProject);
+    
+                    if (!$resultUpdateProject) {
+                        // Rollback the transaction if the update fails
+                        mysqli_rollback($conn);
+                        die('Error updating project: ' . mysqli_error($conn));
+                    }
+    
+    
+                    // Commit the transaction if all queries are successful
+                    mysqli_commit($conn);
+                }
+               
+
+                // Optionally, provide success messages or perform additional actions here
+                echo '<script>
                 setTimeout(function() {
                     swal({
-                        title: "เกิดข้อผิดพลาด",
-                        text: "กรุณากรอกข้อมูลให้ครบ",
-                        type: "error"
+                        title: "สำเร็จ",
+                        text: "อัพเดตข้อมูลสำเร็จ",
+                        type: "success"
                     }, function() {
                         window.location = "../page/plan.php"; //หน้าที่ต้องการให้กระโดดไป
                     });
                 }, 1000);
                 </script>';
-                }
+                exit(); // Exit the script if any user insertion fails
+            } catch (Exception $e) {
+                // Rollback the transaction in case of an exception
+                mysqli_rollback($conn);
+                die('Transaction failed: ' . $e->getMessage());
             }
         }
     } ?>
@@ -213,14 +187,30 @@ $userId = $_SESSION["userId"];
                 <?php
                 include '../connect.php';
                 $con = mysqli_connect($servername, $username, $password, $dbname);
-                $sql = "SELECT * FROM members";
-                $stmt = mysqli_prepare($con, $sql);
-                $stmt->execute();
-                mysqli_stmt_execute($stmt);
-                $result = mysqli_stmt_get_result($stmt);
-
-
+                if (isset($_GET['page'])) {
+                    $id = mysqli_real_escape_string($con, $_GET['page']);
+                    $sql = "SELECT * FROM project WHERE project.project_id = '$id' ";
+                    $stmt = mysqli_prepare($con, $sql);
+                    $stmt->execute();
+                    mysqli_stmt_execute($stmt);
+                    $result = mysqli_stmt_get_result($stmt);
+                    if ($result) {
+                        while ($project = mysqli_fetch_array($result)) {
+                            $projectName = $project['project_name'];
+                            $projectLevel = $project['level'];
+                            $projectStatus = $project['status'];
+                            $projectProcess = $project['process'];
+                            $projectDeadline = $project['deadline'];
+                            $projectDescription = $project['description'];
+                            $projectPdf = $project['pdf_data'];
+                            if ($projectPdf !== null) {
+                                $pdfBase64 = base64_encode($projectPdf);
+                            }
+                        }
+                    }
+                }
                 ?>
+
                 <div class="row d-flex justify-content-center">
                     <div class="card">
                         <a class="back" href="../page/plan.php">
@@ -228,20 +218,22 @@ $userId = $_SESSION["userId"];
                                 <path d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.2 288 416 288c17.7 0 32-14.3 32-32s-14.3-32-32-32l-306.7 0L214.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z" />
                             </svg>
                         </a>
-                        <h5 class="text-center mb-4">Add Plan</h5>
-                        <form class="form-card" action="" method="post" enctype="multipart/form-data">
+                        <h5 class="text-center mb-4">Edit Plan</h5>
+                        <form class="form-card" action="" method="post">
 
                             <div class="row justify-content-between text-left p-4">
-                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">Plan Name<span class="text-danger"> *</span></label> <input type="text" required id="plan" name="plan" placeholder="Enter your plan"> </div>
+                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">Plan Name<span class="text-danger"> *</span></label> <input value="<?php echo $projectName; ?>" type="text" required id="plan" name="plan" placeholder="Enter your plan"> </div>
                                 <div class="col-sm-6 flex-column d-flex">
                                     <label class="form-control-label px-3 pb-1">Level<span class="text-danger"> *</span></label>
 
-                                    <select required name="level" class="form-control select2" style="width: 100%; padding: 8px 15px; font-size: 18px">
+                                    <select required name="level" class="form-control select2" style="width: 100%; padding: 8px 15px; font-size: 18px; margin-top: 5px; height: 50px;">
                                         <option value="" disabled selected>Select Level</option>
                                         <?php
                                         $levelMapping = ['easy' => 1, 'medium' => 2, 'hard' => 3];
-                                        foreach ($levelMapping as $levelName => $numericValue) { ?>
-                                            <option class="dropdown-item text-capitalize" value="<?php echo $numericValue; ?>"> <?php echo $levelName; ?></option>
+                                        foreach ($levelMapping as $levelName => $numericValue) {
+                                            $selected = ($numericValue == $projectLevel) ? 'selected' : '';
+                                        ?>
+                                            <option class="dropdown-item text-capitalize" value="<?php echo $numericValue; ?>" <?php echo $selected; ?>> <?php echo $levelName; ?></option>
                                         <?php } ?>
                                     </select>
 
@@ -254,16 +246,34 @@ $userId = $_SESSION["userId"];
                                 </div>
 
                                 <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ข้อมูลเพิ่มเติม<span class="text-danger"> *</span></label>
-                                    <input type="file" name="pdfFile" accept=".pdf" />
+                                <input type="file" name="newPdfFile" accept=".pdf" />
+                                </div>
+                            </div>
+                            <div class="row justify-content-between text-left p-4">
+                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ความคืบหน้าของการอบรม<span class="text-danger"> *</span></label>
+                                <input type="number" value="<?php echo $projectProcess; ?>" max="100" name="process">
+                                </div>
+
+
+                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">Status<span class="text-danger"> *</span></label>
+                                <select required name="status" class="form-control select2" style="width: 100%; padding: 8px 15px; font-size: 18px;  margin-top: 5px; height: 50px;">
+                                        <option value="" disabled selected>Select Level</option>
+                                        <?php
+                                        $statusMapping = ['Success' => 1, 'In Progess' => 2, 'Failed' => 3];
+                                        foreach ($statusMapping as $statusName => $numericValue) {
+                                            $selected = ($numericValue == $projectStatus) ? 'selected' : '';
+                                        ?>
+                                            <option class="dropdown-item text-capitalize" value="<?php echo $numericValue; ?>" <?php echo $selected; ?>> <?php echo $statusName; ?></option>
+                                        <?php } ?>
+                                    </select>
                                 </div>
                             </div>
                             <div class="row justify-content-between text-left p-4">
                                 <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ข้อมูลเพิ่มเติม<span class="text-danger"> *</span></label>
-                                    <textarea name="description" id="description" cols="30" rows="4"></textarea>
+                                    <textarea name="description" id="" cols="30" rows="4"><?php echo  $projectDescription ?> </textarea>
                                 </div>
-
                             </div>
-
+                           
                             <div class="row justify-content-end">
                                 <div class="d-grid gap-2" style="padding-left: 80px; padding-right: 80px;"> <button type="submit" class="btn-block btn-primary">Submit</button> </div>
                             </div>
@@ -289,6 +299,7 @@ $userId = $_SESSION["userId"];
     <script>
         flatpickr("input[type=datetime-local]", {
             minDate: "today",
+            defaultDate: '<?php echo $projectDeadline; ?>',
         })
     </script>
 </body>

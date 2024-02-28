@@ -77,6 +77,11 @@ include "../auth/checklogin.php";
                         $projectStatus = $row['status'];
                         $projectDeadline = $row['deadline'];
                         $projectDescription = $row['description'];
+                        $projectPdf = $row['pdf_data'];
+                      
+                        if ($projectPdf !== null) {
+                            $pdfBase64 = base64_encode($projectPdf);
+                        }
                         $timestamp = strtotime($projectDeadline);
                         $thaiMonths = array(
                             'January' => 'มกราคม',
@@ -109,7 +114,7 @@ include "../auth/checklogin.php";
                             <path d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.2 288 416 288c17.7 0 32-14.3 32-32s-14.3-32-32-32l-306.7 0L214.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z" />
                         </svg>
                     </a>
-                    <a class="back" href="member_form.php">
+                    <a class="back" href="./plan_edit.php?page=<?php echo $id ?>">
                         <svg xmlns="http://www.w3.org/2000/svg" height="16" width="14" style="position: absolute; top: 60px; right: 60px;" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
                             <path d="M471.6 21.7c-21.9-21.9-57.3-21.9-79.2 0L362.3 51.7l97.9 97.9 30.1-30.1c21.9-21.9 21.9-57.3 0-79.2L471.6 21.7zm-299.2 220c-6.1 6.1-10.8 13.6-13.5 21.9l-29.6 88.8c-2.9 8.6-.6 18.1 5.8 24.6s15.9 8.7 24.6 5.8l88.8-29.6c8.2-2.7 15.7-7.4 21.9-13.5L437.7 172.3 339.7 74.3 172.4 241.7zM96 64C43 64 0 107 0 160V416c0 53 43 96 96 96H352c53 0 96-43 96-96V320c0-17.7-14.3-32-32-32s-32 14.3-32 32v96c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V160c0-17.7 14.3-32 32-32h96c17.7 0 32-14.3 32-32s-14.3-32-32-32H96z" />
                         </svg>
@@ -129,7 +134,7 @@ include "../auth/checklogin.php";
                         </div>
                         <div class="content">
                             <label class="form-label" for="projectName" style="display: inline;">ระยะเวลาสิ้นสุดการดําเนินงาน: </label>
-                            <h2 style="display: inline;  margin-left:15px;  ">วันที่ <?php echo $formattedDate; ?></h2>
+                            <h2 style="display: inline;  margin-left:15px;">วันที่ <?php echo $formattedDate; ?></h2>
                         </div>
                         <div class="content">
                             <label class="form-label" for="projectName" style="display: inline;">ระยะเวลาเริ่มในการดำเนินงาน: </label>
@@ -138,6 +143,18 @@ include "../auth/checklogin.php";
                         <div class="content">
                             <label class="form-label" for="projectName" style="display: inline;">ข้อมูลเพิ่มเติม: </label>
                             <p style="display: inline; font-size:16px;  margin-left:15px; "><?php echo $projectDescription; ?></p>
+                        </div>
+                        <div class="content">
+                            <label class="form-label" for="form-label">PDF File:</label>
+                            <?php
+                            if ($projectPdf !== null){
+                               echo '<embed type="application/pdf" src="data:application/pdf;base64,' . $pdfBase64 . '" width="100%" height="600px" />'; 
+                            } else {
+                                echo '<h2  style="display: inline;  margin-left:15px;">No file</h2>';
+                            }
+                            ?>
+                           
+                            <br>
                         </div>
                         <div class="row mt-4">
                             <div class="col-6">
@@ -235,10 +252,10 @@ include "../auth/checklogin.php";
                                 <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" style="margin-top: 3px;" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
                                     <path d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z" />
                                 </svg>
-                                <h2 style="margin-left: 5px;"> <?php echo  $memberCount; ?>/10</h2>
+                                <h2 style="margin-left: 5px;"> <?php echo  $memberCount; ?>/88</h2>
                             </div>
                         </div>
-                     
+
                     </div>
                 </div>
             </div>

@@ -60,7 +60,7 @@
               </a>
             </li> -->
             <li class="sidebar-item">
-              <a class="sidebar-link" href="../page/plan.php" aria-expanded="false">
+              <a class="sidebar-link <?php echo ($currentPage == 'plan') ? 'active' : ''; ?>" href="../page/plan.php" aria-expanded="false">
                 <span>
                   <i class="ti ti-file-description"></i>
                 </span>

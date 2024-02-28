@@ -21,7 +21,7 @@ if(isset($_GET['id'])) {
             text: "Delete successful",
             type: "success",
         }, function() {
-            window.location = "member_form.php"; //หน้าที่ต้องการให้กระโดดไป
+            window.location = "/php-people-management/page/plan.php"; //หน้าที่ต้องการให้กระโดดไป
         });
     }, 1000);
     </script>';
@@ -33,7 +33,7 @@ if(isset($_GET['id'])) {
                 text: "ไม่สามารถลบได้",
                 type: "warning"
             }, function() {
-                window.location = "member_form.php"; //หน้าที่ต้องการให้กระโดดไป
+                window.location = "/php-people-management/page/plan.php"; //หน้าที่ต้องการให้กระโดดไป
             });
         }, 1000);
         </script>';

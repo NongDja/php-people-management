@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<?php 
+<?php
 include "../auth/checklogin.php";
 $userId = $_SESSION['userId']
 ?>
@@ -16,6 +16,7 @@ $userId = $_SESSION['userId']
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link rel="stylesheet" href="../assets/css/styles.min.css" />
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
     <!-- <link rel="stylesheet" href="../assets/css/main.css"> -->
     <style>
         body {
@@ -303,14 +304,28 @@ $userId = $_SESSION['userId']
             object-fit: cover;
         }
 
-
-
         .container-fluid .projectCard .groupImg a:last-child span {
             color: #999;
             font-size: 1.2em;
         }
     </style>
-
+    <script>
+        function confirmDelete(id) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'You won\'t be able to revert this!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '../plan/plan_delete.php?id=' + id;
+                }
+            });
+        }
+    </script>
 </head>
 
 <body>
@@ -336,10 +351,10 @@ $userId = $_SESSION['userId']
                                         } else {
                                             echo 'แผนงานของฉัน';
                                         } ?> <a style="font-size: 14px;" href="<?php if ($_SESSION['role'] != 3) {
-                                                echo '../plan/plan_add.php';
-                                                } else {
-                                                  echo '../plan/self_add.php';
-                                                } ?>" class="btn btn-info">+เพิ่มข้อมูล</a></h3>
+                                                                                    echo '../plan/plan_add.php';
+                                                                                } else {
+                                                                                    echo '../plan/self_add.php';
+                                                                                } ?>" class="btn btn-info">+เพิ่มข้อมูล</a></h3>
                             </div>
                             <div class="col-6 d-flex justify-content-end">
 
@@ -367,13 +382,13 @@ $userId = $_SESSION['userId']
                         (SELECT COUNT(DISTINCT project_user.project_id) FROM project_user) AS projectCount, 
                         project.* FROM project 
                         JOIN project_user ON project_user.project_id = project.project_id
-                        JOIN members ON members.id = project_user.user_id;";
+                        JOIN members ON members.id = project_user.user_id ORDER BY project.project_id DESC";
                     } else {
                         $sql = "SELECT DISTINCT project.project_id, 
                         (SELECT COUNT(DISTINCT project_user.project_id) FROM project_user WHERE project_user.user_id = '$id') AS projectCount, 
                         project.* FROM project
                         JOIN project_user ON project_user.project_id = project.project_id
-                        JOIN members ON members.id = project_user.user_id WHERE project_user.user_id = '$id'";
+                        JOIN members ON members.id = project_user.user_id WHERE project_user.user_id = '$id' ORDER BY project.project_id DESC";
                     }
 
                     $stmt = mysqli_prepare($con, $sql);
@@ -387,6 +402,7 @@ $userId = $_SESSION['userId']
                             $projectId = $project['project_id'];
                             $projectLevel = $project['level'];
                             $projectStatus = $project['status'];
+                            $projectProcess = $project['process'];
                             $projectCount = $project['projectCount'];
                             $projectName = $project['project_name'];
                             $projectDescription = $project['description'];
@@ -408,19 +424,28 @@ $userId = $_SESSION['userId']
                             <div class="projectCard projectCard2">
                                 <div class="projectTop">
 
-                                    <a href="../plan/plan_detail.php?page=<?php echo$projectId ?>"><?php echo $projectName; ?><br><span> <?php echo (strlen($projectDescription) > 30) ? substr($projectDescription, 0, 30) . '...' : $projectDescription; ?></span></a>
-
-
+                                    <a href="../plan/plan_detail.php?page=<?php echo $projectId ?>"><?php echo $projectName; ?><br><span> <?php echo (strlen($projectDescription) > 30) ? substr($projectDescription, 0, 30) . '...' : $projectDescription; ?></span></a>
                                     <div class="projectDots">
-                                        <li class="material-symbols-outlined dropdown " id="dropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                            more_horiz
+                                        <div class="dropdown">
+                                            <a class="btn btn-ghost dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                                            </a>
 
                                             <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                                <li><a class="dropdown-item" href="#">แก้ไข</a></li>
-                                                <li><a class="dropdown-item" onclick="confirmDelete(<?php echo $row['project_id']; ?>)">ลบ</a></li>
+                                                <li><a class="dropdown-item" href="<?php if ($_SESSION['role'] != 3) { ?>../plan/plan_edit.php?page=<?php echo $projectId;
+                                                                                                                                                } else { ?>../plan/self_edit.php?page=<?php echo $projectId;
+                                                                                                                                                                                    } ?>">แก้ไข</a></li>
+                                                <?php
+                                                if ($_SESSION['role'] != 3 || $userResult->num_rows == 1) { ?>
+                                                    <li><a class="dropdown-item" onclick="confirmDelete(<?php echo $projectId; ?>)">ลบ</a></li>
+                                                <?php    }
+                                                ?>
+
+
                                             </ul>
-                                        </li>
+                                        </div>
                                     </div>
+
+
                                 </div>
                                 <div class="projectProgress">
                                     <div class="process" style=" <?php echo $projectStatus === 1 ? 'background: #dffde0;' : ($projectStatus === 2 ? 'background: #fdf5df;' : 'background: #fddfdf;') ?>">
@@ -431,8 +456,11 @@ $userId = $_SESSION['userId']
                                     </div>
                                 </div>
                                 <div class="task">
-                                    <h2>Task Done: <bold>35</bold> / 50</h2>
-                                    <span class="line"></span>
+                                    <h2>Task Done: <bold><?php echo $projectProcess ?></bold> / 100</h2>
+                                    <div class="progress" style="width: 100%;">
+                                        <div class="progress-bar <?= $projectProcess >= 80 ? 'bg-success' : ($projectProcess >= 25 ? 'bg-info' : 'bg-danger'); ?>" role="progressbar" style="width: <?php echo $projectProcess; ?>%;" aria-valuenow="<?php echo $projectProcess ?>" aria-valuemin="0" aria-valuemax="100"><?php echo $projectProcess ?>%</div>
+                                    </div>
+
                                 </div>
                                 <!-- <div class="divider"></div> -->
                                 <div class="due">
@@ -475,29 +503,10 @@ $userId = $_SESSION['userId']
                                 </div>
                             </div>
                     <?php }
-                    } else {
                     }
-
                     ?>
                 </div>
-                <script>
-                    function confirmDelete(id) {
 
-                        Swal.fire({
-                            title: 'Are you sure?',
-                            text: 'You won\'t be able to revert this!',
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonColor: '#d33',
-                            cancelButtonColor: '#3085d6',
-                            confirmButtonText: 'Yes, delete it!'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.href = '../plan/plan_delete.php?id=' + id;
-                            }
-                        });
-                    }
-                </script>
 
                 <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
                 <script src="../assets/js/sidebarmenu.js"></script>

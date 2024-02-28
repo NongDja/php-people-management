@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<?php 
+<?php
 include "../auth/checklogin.php";
 ?>
 <html lang="en">
@@ -96,78 +96,118 @@ include "../auth/checklogin.php";
 
     <?php if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-if (isset($_POST['plan']) && isset($_POST['level']) && isset($_POST['date']) && isset($_POST['person'])) {
-    echo '
-        <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert-dev.js"></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.css">';
+        if (isset($_POST['plan']) && isset($_POST['level']) && isset($_POST['date']) && isset($_POST['person'])) {
+            echo '
+    <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert-dev.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.css">';
+            if (isset($_FILES["pdfFile"])) {
+                // Check if there are no errors during the file upload
+                if ($_FILES["pdfFile"]["error"] == UPLOAD_ERR_OK) {
+                    $pdfFile = $_FILES["pdfFile"]["tmp_name"];
+                    $pdfContent = file_get_contents($pdfFile);
 
-    include "../connect.php";
-    $conn = mysqli_connect($servername, $username, $password, $dbname);
-    
-    if (!$conn) {
-        die("error" . mysqli_connect_error());
-    }
-    
-    $plan = $_POST['plan'];
-    $level = $_POST['level'];
-    $date = $_POST['date'];
-    $description = $_POST['description'];
-    // Insert into project table
-    $sql = "INSERT INTO project (project_name, level, deadline,description) VALUES ('$plan', '$level', '$date', '$description')";
-    $result = mysqli_query($conn, $sql);
+                    // Your other form data
+                    $plan = $_POST['plan'];
+                    $level = $_POST['level'];
+                    $date = $_POST['date'];
+                    $description = $_POST['description'];
 
-    if ($result) {
-        // Get the last inserted project_id
-        $lastProjectId = mysqli_insert_id($conn);
+                    // Your database connection code
+                    include "../connect.php";
+                    $conn = mysqli_connect($servername, $username, $password, $dbname);
 
-        // Insert into project_user table for each selected user
-        foreach ($_POST['person'] as $userId) {
-            $sqlProjectUser = "INSERT INTO project_user (project_id, user_id) VALUES ('$lastProjectId', '$userId')";
-            $resultProjectUser = mysqli_query($conn, $sqlProjectUser);
+                    if (!$conn) {
+                        die("error" . mysqli_connect_error());
+                    }
 
-            if (!$resultProjectUser) {
-                echo '<script>
+                    // Escape variables to prevent SQL injection
+                    $plan = mysqli_real_escape_string($conn, $plan);
+                    $level = mysqli_real_escape_string($conn, $level);
+                    $date = mysqli_real_escape_string($conn, $date);
+                    $description = mysqli_real_escape_string($conn, $description);
+                    $pdfContent = mysqli_real_escape_string($conn, $pdfContent);
+
+                    // Your SQL query
+                    $sql = "INSERT INTO project (project_name, level, deadline, description, pdf_data) VALUES ('$plan', '$level', '$date', '$description', '$pdfContent')";
+
+                    $result = mysqli_query($conn, $sql);
+                    if ($result) {
+                        // Get the last inserted project_id
+                        $lastProjectId = mysqli_insert_id($conn);
+
+                        // Insert into project_user table for each selected user
+                        foreach ($_POST['person'] as $userId) {
+                            $sqlProjectUser = "INSERT INTO project_user (project_id, user_id) VALUES ('$lastProjectId', '$userId')";
+                            $resultProjectUser = mysqli_query($conn, $sqlProjectUser);
+
+                            if (!$resultProjectUser) {
+                                echo '<script>
+                            setTimeout(function() {
+                                swal({
+                                    title: "เกิดข้อผิดพลาด",
+                                    text: "ไม่สามารถบันทึกข้อมูล user_id=' . $userId . ' ได้",
+                                    type: "error"
+                                }, function() {
+                                    window.location = "../page/plan.php"; //หน้าที่ต้องการให้กระโดดไป
+                                });
+                            }, 1000);
+                            </script>';
+                                exit(); // Exit the script if any user insertion fails
+                            }
+                        }
+
+                        echo '<script>
+                    setTimeout(function() {
+                        swal({
+                            title: "บันทึกข้อมูลเรียบร้อย",
+                            text: "บันทึกข้อมูลเรียบร้อยแล้ว",
+                            type: "success"
+                        }, function() {
+                            window.location = "../page/plan.php"; //หน้าที่ต้องการให้กระโดดไป
+                        });
+                    }, 1000);
+                    </script>';
+                    } else {
+                        echo '<script>
                     setTimeout(function() {
                         swal({
                             title: "เกิดข้อผิดพลาด",
-                            text: "ไม่สามารถบันทึกข้อมูล user_id=' . $userId . ' ได้",
+                            text: "ไม่สามารถบันทึกข้อมูล project ได้",
                             type: "error"
                         }, function() {
                             window.location = "../page/plan.php"; //หน้าที่ต้องการให้กระโดดไป
                         });
                     }, 1000);
                     </script>';
-                exit(); // Exit the script if any user insertion fails
+                    }
+                } else {
+                    echo '<script>
+                    setTimeout(function() {
+                        swal({
+                            title: "เกิดข้อผิดพลาด",
+                            text: "กรุณากรอกข้อมูลให้ครบ",
+                            type: "error"
+                        }, function() {
+                            window.location = "../page/plan.php"; //หน้าที่ต้องการให้กระโดดไป
+                        });
+                    }, 1000);
+                    </script>';
+                }
             }
+        } else {
+            echo '<script>
+                    setTimeout(function() {
+                        swal({
+                            title: "เกิดข้อผิดพลาด",
+                            text: "กรุณากรอกข้อมูลให้ครบ",
+                            type: "error"
+                        }, function() {
+                            window.location = "../page/plan.php"; //หน้าที่ต้องการให้กระโดดไป
+                        });
+                    }, 1000);
+                    </script>';
         }
-
-        echo '<script>
-            setTimeout(function() {
-                swal({
-                    title: "บันทึกข้อมูลเรียบร้อย",
-                    text: "บันทึกข้อมูลเรียบร้อยแล้ว",
-                    type: "success"
-                }, function() {
-                    window.location = "../page/plan.php"; //หน้าที่ต้องการให้กระโดดไป
-                });
-            }, 1000);
-            </script>';
-    } else {
-        echo '<script>
-            setTimeout(function() {
-                swal({
-                    title: "เกิดข้อผิดพลาด",
-                    text: "ไม่สามารถบันทึกข้อมูล project ได้",
-                    type: "error"
-                }, function() {
-                    window.location = "../page/plan.php"; //หน้าที่ต้องการให้กระโดดไป
-                });
-            }, 1000);
-            </script>';
-    }
-}
-
     } ?>
 </head>
 
@@ -200,7 +240,7 @@ if (isset($_POST['plan']) && isset($_POST['level']) && isset($_POST['date']) && 
                             </svg>
                         </a>
                         <h5 class="text-center mb-4">Add Plan</h5>
-                        <form class="form-card" action="" method="post">
+                        <form class="form-card" action="" method="post" enctype="multipart/form-data">
 
                             <div class="row justify-content-between text-left p-4">
                                 <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">Plan Name<span class="text-danger"> *</span></label> <input type="text" required id="plan" name="plan" placeholder="Enter your plan"> </div>
@@ -234,7 +274,7 @@ if (isset($_POST['plan']) && isset($_POST['level']) && isset($_POST['date']) && 
                                             $surname = $row['surname'];
                                             $branch_id = $row['branch_id'];
                                         ?>
-                                            <option data-badge="" value="<?php echo $rowId; ?>"> <?php echo  '000'.$branch_id. ' ' . $firstname . ' ' . $surname; ?></option>
+                                            <option data-badge="" value="<?php echo $rowId; ?>"> <?php echo  '000' . $branch_id . ' ' . $firstname . ' ' . $surname; ?></option>
                                         <?php } ?>
 
                                     </select>
@@ -242,10 +282,10 @@ if (isset($_POST['plan']) && isset($_POST['level']) && isset($_POST['date']) && 
                             </div>
                             <div class="row justify-content-between text-left p-4">
                                 <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ข้อมูลเพิ่มเติม<span class="text-danger"> *</span></label>
-                                    <textarea name="" id="" cols="30" rows="4"></textarea>
+                                    <textarea name="description" id="" cols="30" rows="4"></textarea>
                                 </div>
                                 <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ข้อมูลเพิ่มเติม<span class="text-danger"> *</span></label>
-                                    <input type="file" name="" id="">
+                                    <input type="file" name="pdfFile" accept=".pdf" />
                                 </div>
                             </div>
 
