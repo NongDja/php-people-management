@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <?php
 include "../auth/checklogin.php";
+$userId = $_SESSION['userId']
 ?>
 <html lang="en">
 
@@ -114,7 +115,15 @@ include "../auth/checklogin.php";
             $date = $_POST['date'];
             $description = $_POST['description'];
             $status = $_POST['status'];
-            $newPdfFile = $_FILES["newPdfFile"]["tmp_name"]; // New file uploaded
+
+            $train = $_POST['train'];
+
+            $budgetUserUsed = $_POST['budgetUsed'];
+
+            if (isset($_FILES["newPdfFile"])) {
+                $newPdfFile = $_FILES["newPdfFile"]["tmp_name"]; // New file uploaded
+            }
+
             // Start a transaction for atomicity
             mysqli_begin_transaction($conn);
 
@@ -122,33 +131,31 @@ include "../auth/checklogin.php";
                 // Update project table
                 if (isset($newPdfFile) && $_FILES["newPdfFile"]["error"] == UPLOAD_ERR_OK) {
                     $pdfContent = file_get_contents($newPdfFile);
-                    $sqlUpdateProject = "UPDATE project SET project_name = '$plan', level = '$level', deadline = '$date', description = '$description',status = '$status' , pdf_data = '$pdfContent'  WHERE project_id = '$id'";
+                    $pdfContent = mysqli_real_escape_string($conn, $pdfContent);
+                    $sqlUpdateProject = "UPDATE project SET project_name = '$plan', level = '$level', deadline = '$date', description = '$description',status = '$status' , pdf_data = '$pdfContent' WHERE project_id = '$id'";
                     $resultUpdateProject = mysqli_query($conn, $sqlUpdateProject);
-    
-                    if (!$resultUpdateProject) {
-                        // Rollback the transaction if the update fails
-                        mysqli_rollback($conn);
-                        die('Error updating project: ' . mysqli_error($conn));
-                    }
-    
-    
-                    // Commit the transaction if all queries are successful
-                    mysqli_commit($conn);
                 } else {
                     $sqlUpdateProject = "UPDATE project SET project_name = '$plan', level = '$level', deadline = '$date', description = '$description',status = '$status'  WHERE project_id = '$id'";
                     $resultUpdateProject = mysqli_query($conn, $sqlUpdateProject);
-    
-                    if (!$resultUpdateProject) {
-                        // Rollback the transaction if the update fails
-                        mysqli_rollback($conn);
-                        die('Error updating project: ' . mysqli_error($conn));
-                    }
-    
-    
-                    // Commit the transaction if all queries are successful
-                    mysqli_commit($conn);
                 }
-               
+
+                if (!$resultUpdateProject) {
+                    // Rollback the transaction if the update fails
+                    mysqli_rollback($conn);
+                    die('Error updating project: ' . mysqli_error($conn));
+                }
+
+                // Insert into project_user table for each selected user
+                $sqlProjectUser = "UPDATE project_user SET train = $train, budget_user_used = $budgetUserUsed WHERE project_id = '$id' AND user_id = $userId";
+                $resultProjectUser = mysqli_query($conn, $sqlProjectUser);
+
+                if (!$resultProjectUser) {
+                    // Rollback the transaction if the insert fails
+                    mysqli_rollback($conn);
+                    die('Error inserting project_user record: ' . mysqli_error($conn));
+                }
+
+                mysqli_commit($conn);
 
                 // Optionally, provide success messages or perform additional actions here
                 echo '<script>
@@ -189,7 +196,10 @@ include "../auth/checklogin.php";
                 $con = mysqli_connect($servername, $username, $password, $dbname);
                 if (isset($_GET['page'])) {
                     $id = mysqli_real_escape_string($con, $_GET['page']);
-                    $sql = "SELECT * FROM project WHERE project.project_id = '$id' ";
+                    $sql = "SELECT project.*, project_user.*
+                    FROM project
+                    JOIN project_user ON project.project_id = project_user.project_id
+                    WHERE project.project_id = $id AND project_user.user_id = $userId;";
                     $stmt = mysqli_prepare($con, $sql);
                     $stmt->execute();
                     mysqli_stmt_execute($stmt);
@@ -202,6 +212,9 @@ include "../auth/checklogin.php";
                             $projectProcess = $project['process'];
                             $projectDeadline = $project['deadline'];
                             $projectDescription = $project['description'];
+                            $projectTrain = $project['train'];
+                            $projectBudget = $project['budget'];
+                            $projectBudgetUserUsed = $project['budget_user_used'];
                             $projectPdf = $project['pdf_data'];
                             if ($projectPdf !== null) {
                                 $pdfBase64 = base64_encode($projectPdf);
@@ -219,22 +232,31 @@ include "../auth/checklogin.php";
                             </svg>
                         </a>
                         <h5 class="text-center mb-4">Edit Plan</h5>
-                        <form class="form-card" action="" method="post">
+                        <form class="form-card" action="" method="post" enctype="multipart/form-data">
 
                             <div class="row justify-content-between text-left p-4">
                                 <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">Plan Name<span class="text-danger"> *</span></label> <input value="<?php echo $projectName; ?>" type="text" required id="plan" name="plan" placeholder="Enter your plan"> </div>
                                 <div class="col-sm-6 flex-column d-flex">
-                                    <label class="form-control-label px-3 pb-1">Level<span class="text-danger"> *</span></label>
-
+                                    <label class="form-control-label px-3 pb-1">เลือกหน่วยงาน<span class="text-danger"> *</span></label>
                                     <select required name="level" class="form-control select2" style="width: 100%; padding: 8px 15px; font-size: 18px; margin-top: 5px; height: 50px;">
-                                        <option value="" disabled selected>Select Level</option>
+                                        <option value="" disabled selected>เลือกหน่วยงาน</option>
                                         <?php
-                                        $levelMapping = ['easy' => 1, 'medium' => 2, 'hard' => 3];
-                                        foreach ($levelMapping as $levelName => $numericValue) {
-                                            $selected = ($numericValue == $projectLevel) ? 'selected' : '';
+                                        $sql = "SELECT or_id, or_name FROM organization";
+                                        $levelResult = mysqli_query($con, $sql);
+
+                                        while ($row = mysqli_fetch_assoc($levelResult)) {
+                                            $levelId = $row['or_id'];
+                                            $levelName = $row['or_name'];
+                                            $selected = ($projectLevel == $levelId) ? 'selected' : '';
                                         ?>
-                                            <option class="dropdown-item text-capitalize" value="<?php echo $numericValue; ?>" <?php echo $selected; ?>> <?php echo $levelName; ?></option>
-                                        <?php } ?>
+                                            <option class="dropdown-item text-capitalize" value="<?php echo $levelId; ?>" <?php echo $selected; ?> > 
+                                                <?php echo $levelId . ' - ' . $levelName; ?>
+                                            </option>
+                                        <?php
+                                        }
+                                        // Close the result set
+                                        mysqli_free_result($levelResult);
+                                        ?>
                                     </select>
 
                                 </div>
@@ -245,18 +267,46 @@ include "../auth/checklogin.php";
                                     <input type="datetime-local" name="date" placeholder="Select Date">
                                 </div>
 
-                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ข้อมูลเพิ่มเติม<span class="text-danger"> *</span></label>
-                                <input type="file" name="newPdfFile" accept=".pdf" />
+                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">รายละเอียดการอบรม<span class="text-danger"> *</span></label>
+                                    <input type="file" name="newPdfFile" accept=".pdf" />
                                 </div>
                             </div>
+
+                            <div class="row justify-content-between text-left p-4">
+                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">งบประมาณการอบรม<span class="text-danger"> *</span></label>
+                                    <input value="<?php echo number_format($projectBudget); ?> " disabled type="text">
+                                </div>
+                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">งบประมาณที่ใช้ไป <span class="text-danger">*</span></label>
+                                    <input value="<?php echo number_format($projectBudgetUserUsed); ?>" name="budgetUsed" type="number">
+                                </div>
+                            </div>
+
+
+
+                            <div class="row justify-content-between text-left p-4">
+                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ข้อมูลเพิ่มเติม<span class="text-danger"> *</span></label>
+                                    <textarea name="description" id="" cols="30" rows="4"><?php echo  $projectDescription ?> </textarea>
+                                </div>
+                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">การไปอบรม<span class="text-danger"> *</span></label>
+                                    <select required name="train" class="form-control select2" style="width: 100%; padding: 8px 15px; font-size: 18px;  margin-top: 5px; height: 50px;">
+                                        <option value="" disabled selected>การไปอบรม</option>
+                                        <?php
+                                        $trainMapping = ['ไม่ไป' => 0, 'ไป' => 1];
+                                        foreach ($trainMapping as $trainName => $numericValue) {
+                                            $selected = ($numericValue == $projectTrain) ? 'selected' : '';
+                                        ?>
+                                            <option class="dropdown-item text-capitalize" value="<?php echo $numericValue; ?>" <?php echo $selected; ?>> <?php echo $trainName; ?></option>
+                                        <?php } ?>
+                                    </select>
+                                </div>
+                            </div>
+
                             <div class="row justify-content-between text-left p-4">
                                 <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ความคืบหน้าของการอบรม<span class="text-danger"> *</span></label>
-                                <input type="number" value="<?php echo $projectProcess; ?>" max="100" name="process">
+                                    <input type="number" value="<?php echo $projectProcess; ?>" max="100" name="process">
                                 </div>
-
-
                                 <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">Status<span class="text-danger"> *</span></label>
-                                <select required name="status" class="form-control select2" style="width: 100%; padding: 8px 15px; font-size: 18px;  margin-top: 5px; height: 50px;">
+                                    <select required name="status" class="form-control select2" style="width: 100%; padding: 8px 15px; font-size: 18px;  margin-top: 5px; height: 50px;">
                                         <option value="" disabled selected>Select Level</option>
                                         <?php
                                         $statusMapping = ['Success' => 1, 'In Progess' => 2, 'Failed' => 3];
@@ -268,12 +318,7 @@ include "../auth/checklogin.php";
                                     </select>
                                 </div>
                             </div>
-                            <div class="row justify-content-between text-left p-4">
-                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ข้อมูลเพิ่มเติม<span class="text-danger"> *</span></label>
-                                    <textarea name="description" id="" cols="30" rows="4"><?php echo  $projectDescription ?> </textarea>
-                                </div>
-                            </div>
-                           
+
                             <div class="row justify-content-end">
                                 <div class="d-grid gap-2" style="padding-left: 80px; padding-right: 80px;"> <button type="submit" class="btn-block btn-primary">Submit</button> </div>
                             </div>

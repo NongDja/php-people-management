@@ -96,7 +96,7 @@ include "../auth/checklogin.php";
 
     <?php if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-        if (isset($_POST['plan']) && isset($_POST['level']) && isset($_POST['date']) && isset($_POST['person'])) {
+        if (isset($_POST['plan']) && isset($_POST['level']) && isset($_POST['date']) && isset($_POST['person']) && isset($_POST['budget'])) {
             echo '
     <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert-dev.js"></script>
@@ -112,6 +112,7 @@ include "../auth/checklogin.php";
                     $level = $_POST['level'];
                     $date = $_POST['date'];
                     $description = $_POST['description'];
+                    $budget = $_POST['budget'];
 
                     // Your database connection code
                     include "../connect.php";
@@ -127,9 +128,9 @@ include "../auth/checklogin.php";
                     $date = mysqli_real_escape_string($conn, $date);
                     $description = mysqli_real_escape_string($conn, $description);
                     $pdfContent = mysqli_real_escape_string($conn, $pdfContent);
-
+                    $budget = mysqli_real_escape_string($conn, $budget);
                     // Your SQL query
-                    $sql = "INSERT INTO project (project_name, level, deadline, description, pdf_data) VALUES ('$plan', '$level', '$date', '$description', '$pdfContent')";
+                    $sql = "INSERT INTO project (project_name, level, deadline, description, pdf_data, budget) VALUES ('$plan', '$level', '$date', '$description', '$pdfContent',$budget)";
 
                     $result = mysqli_query($conn, $sql);
                     if ($result) {
@@ -138,10 +139,12 @@ include "../auth/checklogin.php";
 
                         // Insert into project_user table for each selected user
                         foreach ($_POST['person'] as $userId) {
-                            $sqlProjectUser = "INSERT INTO project_user (project_id, user_id) VALUES ('$lastProjectId', '$userId')";
+                            $sqlProjectUser = "INSERT INTO project_user (project_id, user_id, train,budget_user_used) VALUES ('$lastProjectId', '$userId', 0,0)";
                             $resultProjectUser = mysqli_query($conn, $sqlProjectUser);
 
                             if (!$resultProjectUser) {
+                                mysqli_rollback($conn);
+                                die('Transaction failed: ' . $e->getMessage());
                                 echo '<script>
                             setTimeout(function() {
                                 swal({
@@ -169,6 +172,8 @@ include "../auth/checklogin.php";
                     }, 1000);
                     </script>';
                     } else {
+                        mysqli_rollback($conn);
+                        die('Transaction failed: ' . $e->getMessage());
                         echo '<script>
                     setTimeout(function() {
                         swal({
@@ -182,6 +187,8 @@ include "../auth/checklogin.php";
                     </script>';
                     }
                 } else {
+                    mysqli_rollback($conn);
+                    die('Transaction failed: ' . $e->getMessage());
                     echo '<script>
                     setTimeout(function() {
                         swal({
@@ -196,6 +203,8 @@ include "../auth/checklogin.php";
                 }
             }
         } else {
+            mysqli_rollback($conn);
+            die('Transaction failed: ' . $e->getMessage());
             echo '<script>
                     setTimeout(function() {
                         swal({
@@ -243,24 +252,35 @@ include "../auth/checklogin.php";
                         <form class="form-card" action="" method="post" enctype="multipart/form-data">
 
                             <div class="row justify-content-between text-left p-4">
-                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">Plan Name<span class="text-danger"> *</span></label> <input type="text" required id="plan" name="plan" placeholder="Enter your plan"> </div>
+                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ชื่อการอบรม<span class="text-danger"> *</span></label> <input type="text" required id="plan" name="plan" placeholder="Enter your plan"> </div>
                                 <div class="col-sm-6 flex-column d-flex">
-                                    <label class="form-control-label px-3 pb-1">Level<span class="text-danger"> *</span></label>
+                                    <label class="form-control-label px-3 pb-1">หน่วยงาน<span class="text-danger"> *</span></label>
 
-                                    <select required name="level" class="form-control select2" style="width: 100%; padding: 8px 15px; font-size: 18px">
-                                        <option value="" disabled selected>Select Level</option>
+                                    <select required name="level" class="form-control select2" style="width: 100%; padding: 8px 15px; font-size: 18px; margin-top: 5px; height: 50px;">
+                                        <option value="" disabled selected>เลือกหน่วยงาน</option>
                                         <?php
-                                        $levelMapping = ['easy' => 1, 'medium' => 2, 'hard' => 3];
-                                        foreach ($levelMapping as $levelName => $numericValue) { ?>
-                                            <option class="dropdown-item text-capitalize" value="<?php echo $numericValue; ?>"> <?php echo $levelName; ?></option>
-                                        <?php } ?>
+                                        $sql = "SELECT or_id, or_name FROM organization";
+                                        $levelResult = mysqli_query($con, $sql);
+
+                                        while ($row = mysqli_fetch_assoc($levelResult)) {
+                                            $levelId = $row['or_id'];
+                                            $levelName = $row['or_name'];
+                                        ?>
+                                            <option class="dropdown-item text-capitalize" value="<?php echo $levelId; ?>">
+                                            <?php echo $levelId . ' - ' . $levelName; ?>
+                                            </option>
+                                        <?php
+                                        }
+                                        // Close the result set
+                                        mysqli_free_result($levelResult);
+                                        ?>
                                     </select>
 
                                 </div>
 
                             </div>
                             <div class="row justify-content-between text-left p-4">
-                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">Due Date<span class="text-danger"> *</span></label>
+                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">วันที่<span class="text-danger"> *</span></label>
                                     <input type="datetime-local" name="date" placeholder="Select Date">
                                 </div>
 
@@ -281,13 +301,19 @@ include "../auth/checklogin.php";
                                 </div>
                             </div>
                             <div class="row justify-content-between text-left p-4">
-                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ข้อมูลเพิ่มเติม<span class="text-danger"> *</span></label>
-                                    <textarea name="description" id="" cols="30" rows="4"></textarea>
+                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">งบประมาณ<span class="text-danger"> *</span></label>
+                                    <input type="number" required id="budget" name="budget" placeholder="Enter your budget">
                                 </div>
-                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ข้อมูลเพิ่มเติม<span class="text-danger"> *</span></label>
+                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">รายละเอียดการอบรม<span class="text-danger"> *</span></label>
                                     <input type="file" name="pdfFile" accept=".pdf" />
                                 </div>
                             </div>
+                            <div class="row justify-content-between text-left p-4">
+                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ข้อมูลเพิ่มเติม<span class="text-danger"> *</span></label>
+                                    <textarea name="description" id="" cols="30" rows="4"></textarea>
+                                </div>
+                            </div>
+
 
                             <div class="row justify-content-end">
                                 <div class="d-grid gap-2" style="padding-left: 80px; padding-right: 80px;"> <button type="submit" class="btn-block btn-primary">Submit</button> </div>

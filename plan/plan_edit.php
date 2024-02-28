@@ -115,6 +115,7 @@ include "../auth/checklogin.php";
             $description = $_POST['description'];
             $status = $_POST['status'];
             $process = $_POST['process'];
+            $budget = $_POST['budget'];
             $newPdfFile = $_FILES["newPdfFile"]["tmp_name"]; // New file uploaded
             // Start a transaction for atomicity
             mysqli_begin_transaction($conn);
@@ -133,9 +134,9 @@ include "../auth/checklogin.php";
                             die('Error deleting old project_user records: ' . mysqli_error($conn));
                         }
                         $pdfContent = mysqli_real_escape_string($conn, $pdfContent);
-
+                        $budget = mysqli_real_escape_string($conn, $budget);
                         // Update project table
-                        $sqlUpdateProject = "UPDATE project SET project_name = '$plan', level = '$level', deadline = '$date', description = '$description',status = '$status' , process = $process, pdf_data = '$pdfContent'  WHERE project_id = '$id'";
+                        $sqlUpdateProject = "UPDATE project SET project_name = '$plan', level = '$level', deadline = '$date', description = '$description',status = '$status' , process = $process, pdf_data = '$pdfContent', budget = '$budget'  WHERE project_id = '$id'";
                         $resultUpdateProject = mysqli_query($conn, $sqlUpdateProject);
                     }
                      else {
@@ -148,9 +149,9 @@ include "../auth/checklogin.php";
                         mysqli_rollback($conn);
                         die('Error deleting old project_user records: ' . mysqli_error($conn));
                     }
-
+                    $budget = mysqli_real_escape_string($conn, $budget);
                     // Update project table
-                    $sqlUpdateProject = "UPDATE project SET project_name = '$plan', level = '$level', deadline = '$date', description = '$description',status = '$status' , process =   $process  WHERE project_id = '$id'";
+                    $sqlUpdateProject = "UPDATE project SET project_name = '$plan', level = '$level', deadline = '$date', description = '$description',status = '$status' , process = $process, budget = '$budget'  WHERE project_id = '$id'";
                     $resultUpdateProject = mysqli_query($conn, $sqlUpdateProject);
                 }
 
@@ -228,6 +229,7 @@ include "../auth/checklogin.php";
                             $projectProcess = $project['process'];
                             $projectStatus = $project['status'];
                             $projectDeadline = $project['deadline'];
+                            $projectBudget = $project['budget'];
                             $projectDescription = $project['description'];
                             $projectPdf = $project['pdf_data'];
                             if ($projectPdf !== null) {
@@ -254,14 +256,24 @@ include "../auth/checklogin.php";
                                     <label class="form-control-label px-3 pb-1">Level<span class="text-danger"> *</span></label>
 
                                     <select required name="level" class="form-control select2" style="width: 100%; padding: 8px 15px; font-size: 18px; margin-top: 5px; height: 50px;">
-                                        <option value="" disabled selected>Select Level</option>
+                                        <option value="" disabled selected>เลือกหน่วยงาน</option>
                                         <?php
-                                        $levelMapping = ['easy' => 1, 'medium' => 2, 'hard' => 3];
-                                        foreach ($levelMapping as $levelName => $numericValue) {
-                                            $selected = ($numericValue == $projectLevel) ? 'selected' : '';
+                                        $sql = "SELECT or_id, or_name FROM organization";
+                                        $levelResult = mysqli_query($con, $sql);
+
+                                        while ($row = mysqli_fetch_assoc($levelResult)) {
+                                            $levelId = $row['or_id'];
+                                            $levelName = $row['or_name'];
+                                            $selected = ($projectLevel == $levelId) ? 'selected' : '';
                                         ?>
-                                            <option class="dropdown-item text-capitalize" value="<?php echo $numericValue; ?>" <?php echo $selected; ?>> <?php echo $levelName; ?></option>
-                                        <?php } ?>
+                                            <option class="dropdown-item text-capitalize" value="<?php echo $levelId; ?>" <?php echo $selected; ?> > 
+                                                <?php echo $levelId . ' - ' . $levelName; ?>
+                                            </option>
+                                        <?php
+                                        }
+                                        // Close the result set
+                                        mysqli_free_result($levelResult);
+                                        ?>
                                     </select>
 
                                 </div>
@@ -316,15 +328,17 @@ include "../auth/checklogin.php";
                                 </div>
                             </div>
                             <div class="row justify-content-between text-left p-4">
-                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ข้อมูลเพิ่มเติม<span class="text-danger"> *</span></label>
-                                    <textarea name="description" id="" cols="30" rows="4"><?php echo  $projectDescription ?> </textarea>
+                            <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">งบประมาณการอบรม<span class="text-danger"> *</span></label>
+                                    <input value="<?php echo $projectBudget;?>" name="budget" type="number">
                                 </div>
+                              
 
 
-                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ข้อมูลเพิ่มเติม<span class="text-danger"> *</span></label>
+                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">รายละเอียดการอบรม<span class="text-danger"> *</span></label>
                                     <input type="file" name="newPdfFile" accept=".pdf" />
                                 </div>
                             </div>
+
                             <div class="row justify-content-between text-left p-4">
                                 <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">Status<span class="text-danger"> *</span></label>
                                     <select required name="status" class="form-control select2" style="width: 100%; padding: 8px 15px; font-size: 18px; margin-top: 5px; height: 50px;">
@@ -341,8 +355,15 @@ include "../auth/checklogin.php";
                                 <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ความคืบหน้าของการอบรม<span class="text-danger"> *</span></label>
                                     <input type="number" value="<?php echo $projectProcess; ?>" max="100" name="process">
                                 </div>
-
                             </div>
+
+                            <div class="row justify-content-between text-left p-4">
+                            <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ข้อมูลเพิ่มเติม<span class="text-danger"> *</span></label>
+                                    <textarea name="description" id="" cols="30" rows="4"><?php echo  $projectDescription ?> </textarea>
+                                </div>
+                              
+                            </div>
+
                             <div class="row justify-content-end">
                                 <div class="d-grid gap-2" style="padding-left: 80px; padding-right: 80px;"> <button type="submit" class="btn-block btn-primary">Submit</button> </div>
                             </div>

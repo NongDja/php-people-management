@@ -380,14 +380,16 @@ $userId = $_SESSION['userId']
                     if ($_SESSION['role'] != 3) {
                         $sql = "SELECT DISTINCT project.project_id, 
                         (SELECT COUNT(DISTINCT project_user.project_id) FROM project_user) AS projectCount, 
-                        project.* FROM project 
+                        project.*,organization.or_name FROM project 
                         JOIN project_user ON project_user.project_id = project.project_id
+                        JOIN organization ON project.level = organization.or_id
                         JOIN members ON members.id = project_user.user_id ORDER BY project.project_id DESC";
                     } else {
                         $sql = "SELECT DISTINCT project.project_id, 
                         (SELECT COUNT(DISTINCT project_user.project_id) FROM project_user WHERE project_user.user_id = '$id') AS projectCount, 
-                        project.* FROM project
+                        project.*,organization.or_name FROM project 
                         JOIN project_user ON project_user.project_id = project.project_id
+                        JOIN organization ON project.level = organization.or_id
                         JOIN members ON members.id = project_user.user_id WHERE project_user.user_id = '$id' ORDER BY project.project_id DESC";
                     }
 
@@ -407,6 +409,7 @@ $userId = $_SESSION['userId']
                             $projectName = $project['project_name'];
                             $projectDescription = $project['description'];
                             $projectDate = $project['deadline'];
+                            $projectOrganizeName = $project['or_name'];
 
                             $userQuery = "SELECT members.image_data 
                             FROM members 
@@ -432,15 +435,12 @@ $userId = $_SESSION['userId']
 
                                             <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                                                 <li><a class="dropdown-item" href="<?php if ($_SESSION['role'] != 3) { ?>../plan/plan_edit.php?page=<?php echo $projectId;
-                                                                                                                                                } else { ?>../plan/self_edit.php?page=<?php echo $projectId;
-                                                                                                                                                                                    } ?>">แก้ไข</a></li>
-                                                <?php
-                                                if ($_SESSION['role'] != 3 || $userResult->num_rows == 1) { ?>
+                                                                                    } else { ?>../plan/self_edit.php?page=<?php echo $projectId;
+                                                                                    } ?>">แก้ไข</a></li>
+                                                <?php if ($_SESSION['role'] != 3) { ?>
                                                     <li><a class="dropdown-item" onclick="confirmDelete(<?php echo $projectId; ?>)">ลบ</a></li>
                                                 <?php    }
                                                 ?>
-
-
                                             </ul>
                                         </div>
                                     </div>
@@ -452,7 +452,7 @@ $userId = $_SESSION['userId']
                                         <h2 style="<?php echo $projectStatus === 1 ? 'color: #69bc72;' : ($projectStatus === 2 ? 'color: #e1701a;' : 'color: #ec0b0b;') ?>"><?php echo $projectStatus = $projectStatus === 1 ? 'Success' : ($projectStatus === 2 ? 'In Progress' : 'Failed'); ?></h2>
                                     </div>
                                     <div class="priority">
-                                        <h2 style="<?php echo $projectLevel === 1 ? 'color: #69bc72;' : ($projectStatus === 2 ? 'color: #e1701a;' : 'color: #ec0b0b;') ?>"><?php echo $projectLevel = $projectLevel === 1 ? 'Low Priority' : ($projectLevel === 2 ? 'Medium Priority' : 'High Priority'); ?></h2>
+                                        <h2 style="<?php echo $projectLevel === 1 ? 'color: #69bc72;' : ($projectStatus === 2 ? 'color: #e1701a;' : 'color: #ec0b0b;') ?>"><?php echo  $projectOrganizeName; ?></h2>
                                     </div>
                                 </div>
                                 <div class="task">

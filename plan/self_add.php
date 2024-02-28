@@ -113,6 +113,7 @@ $userId = $_SESSION["userId"];
                     $level = $_POST['level'];
                     $date = $_POST['date'];
                     $description = $_POST['description'];
+                    $budget = $_POST['budget'];
 
                     // Your database connection code
                     include "../connect.php";
@@ -128,9 +129,9 @@ $userId = $_SESSION["userId"];
                     $date = mysqli_real_escape_string($conn, $date);
                     $description = mysqli_real_escape_string($conn, $description);
                     $pdfContent = mysqli_real_escape_string($conn, $pdfContent);
-
+                    $budget = mysqli_real_escape_string($conn, $budget);
                     // Your SQL query
-                    $sql = "INSERT INTO project (project_name, level, deadline, description, pdf_data) VALUES ('$plan', '$level', '$date', '$description', '$pdfContent')";
+                    $sql = "INSERT INTO project (project_name, level, deadline, description, pdf_data, budget) VALUES ('$plan', '$level', '$date', '$description', '$pdfContent',$budget)";
 
                     $result = mysqli_query($conn, $sql);
                     if ($result) {
@@ -138,7 +139,7 @@ $userId = $_SESSION["userId"];
 
                         // Insert into project_user table for each selected user
 
-                        $sqlProjectUser = "INSERT INTO project_user (project_id, user_id) VALUES ('$lastProjectId', '$userId')";
+                        $sqlProjectUser = "INSERT INTO project_user (project_id, user_id,train,budget_user_used) VALUES ('$lastProjectId', '$userId',0, 0)";
                         $resultProjectUser = mysqli_query($conn, $sqlProjectUser);
 
                         if (!$resultProjectUser) {
@@ -234,15 +235,26 @@ $userId = $_SESSION["userId"];
                             <div class="row justify-content-between text-left p-4">
                                 <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">Plan Name<span class="text-danger"> *</span></label> <input type="text" required id="plan" name="plan" placeholder="Enter your plan"> </div>
                                 <div class="col-sm-6 flex-column d-flex">
-                                    <label class="form-control-label px-3 pb-1">Level<span class="text-danger"> *</span></label>
+                                    <label class="form-control-label px-3 pb-1">เลือกหน่วยงาน<span class="text-danger"> *</span></label>
 
-                                    <select required name="level" class="form-control select2" style="width: 100%; padding: 8px 15px; font-size: 18px">
-                                        <option value="" disabled selected>Select Level</option>
+                                    <select required name="level" class="form-control select2" style="width: 100%; padding: 8px 15px; font-size: 18px; margin-top: 5px; height: 50px;">
+                                        <option value="" disabled selected>เลือกหน่วยงาน</option>
                                         <?php
-                                        $levelMapping = ['easy' => 1, 'medium' => 2, 'hard' => 3];
-                                        foreach ($levelMapping as $levelName => $numericValue) { ?>
-                                            <option class="dropdown-item text-capitalize" value="<?php echo $numericValue; ?>"> <?php echo $levelName; ?></option>
-                                        <?php } ?>
+                                        $sql = "SELECT or_id, or_name FROM organization";
+                                        $levelResult = mysqli_query($con, $sql);
+
+                                        while ($row = mysqli_fetch_assoc($levelResult)) {
+                                            $levelId = $row['or_id'];
+                                            $levelName = $row['or_name'];
+                                        ?>
+                                            <option class="dropdown-item text-capitalize" value="<?php echo $levelId; ?>">
+                                                <?php echo $levelId . ' - ' . $levelName; ?>
+                                            </option>
+                                        <?php
+                                        }
+                                        // Close the result set
+                                        mysqli_free_result($levelResult);
+                                        ?>
                                     </select>
 
                                 </div>
@@ -253,11 +265,14 @@ $userId = $_SESSION["userId"];
                                     <input type="datetime-local" name="date" placeholder="Select Date">
                                 </div>
 
-                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ข้อมูลเพิ่มเติม<span class="text-danger"> *</span></label>
+                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">รายละเอียดการอบรม<span class="text-danger"> *</span></label>
                                     <input type="file" name="pdfFile" accept=".pdf" />
                                 </div>
                             </div>
                             <div class="row justify-content-between text-left p-4">
+                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">งบประมาณ<span class="text-danger"> *</span></label>
+                                    <input type="number" required id="budget" name="budget" placeholder="Enter your budget">
+                                </div>
                                 <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ข้อมูลเพิ่มเติม<span class="text-danger"> *</span></label>
                                     <textarea name="description" id="description" cols="30" rows="4"></textarea>
                                 </div>

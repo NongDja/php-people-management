@@ -67,7 +67,8 @@ include "../auth/checklogin.php";
                 $con = mysqli_connect($servername, $username, $password, $dbname);
                 if (isset($_GET['page'])) {
                     $id = mysqli_real_escape_string($con, $_GET['page']);
-                    $sql = "SELECT project.* FROM project 
+                    $sql = "SELECT project.*, organization.* FROM project 
+                    JOIN organization ON project.level = organization.or_id
                     WHERE project.project_id = '$id'";
                     $result = mysqli_query($con, $sql);
                     if ($result) {
@@ -78,7 +79,18 @@ include "../auth/checklogin.php";
                         $projectDeadline = $row['deadline'];
                         $projectDescription = $row['description'];
                         $projectPdf = $row['pdf_data'];
-                      
+                        $projectOrganizeName = $row['or_name'];
+                        $projectBudget = $row['budget'];
+                        $totalBudgetUsed = 0;
+                        $sql1 = "SELECT * FROM project_user WHERE project_id = $id";
+                        $result1 = mysqli_query($con, $sql1);
+                        
+                        while ($row1 = mysqli_fetch_assoc($result1)) {
+                            $budgetUsed = $row1['budget_user_used'];
+                            
+                            // Display or use $budgetUsed as needed
+                            $totalBudgetUsed += $budgetUsed;
+                        }
                         if ($projectPdf !== null) {
                             $pdfBase64 = base64_encode($projectPdf);
                         }
@@ -125,35 +137,47 @@ include "../auth/checklogin.php";
                         </div>
 
                         <div class="mt-4">
-                            <label class="form-label" for="projectName" style="display: inline;">ระดับความยาก: </label>
-                            <h2 style="display: inline; margin-left:15px; <?php echo $projectLevel == 1 ? 'color: #69bc72;' : ($projectLevel == 2 ? 'color: #e1701a;' : 'color: #ec0b0b;') ?>"><?php echo $projectLevel = $projectLevel == 1 ? 'Low Priority' : ($projectLevel == 2 ? 'Medium Priority' : 'High Priority'); ?></h2>
+                            <label class="form-label" for="projectName" style="display: inline;">หน่วยงาน: </label>
+                            <h2 style="display: inline; margin-left:15px; <?php echo $projectLevel == 1 ? 'color: #69bc72;' : ($projectLevel == 2 ? 'color: #e1701a;' : 'color: #ec0b0b;') ?>"><?php echo  $projectOrganizeName; ?></h2>
                         </div>
                         <div class="content">
                             <label class="form-label" for="projectName" style="display: inline;">สถานะแผนงาน: </label>
                             <h2 style="display: inline;  margin-left:15px;  <?php echo $projectStatus == 1 ? 'color: #69bc72;' : ($projectStatus == 2 ? 'color: #e1701a;' : 'color: #ec0b0b;') ?>"><?php echo $projectStatus = $projectStatus == 1 ? 'Success' : ($projectStatus == 2 ? 'In Progress' : 'Failed'); ?></h2>
                         </div>
                         <div class="content">
-                            <label class="form-label" for="projectName" style="display: inline;">ระยะเวลาสิ้นสุดการดําเนินงาน: </label>
+                            <label class="form-label" for="projectName" style="display: inline;">ระยะเวลาเริ่มในการดำเนินงาน: </label>
                             <h2 style="display: inline;  margin-left:15px;">วันที่ <?php echo $formattedDate; ?></h2>
                         </div>
                         <div class="content">
-                            <label class="form-label" for="projectName" style="display: inline;">ระยะเวลาเริ่มในการดำเนินงาน: </label>
+                            <label class="form-label" for="projectName" style="display: inline;">ระยะเวลาสิ้นสุดการดําเนินงาน: </label>
                             <h2 style="display: inline;  margin-left:15px;  ">วันที่ <?php echo $formattedDate; ?></h2>
+                        </div>
+                        <div class="content">
+                            <label class="form-label" for="projectName" style="display: inline;">งบประมาณ: </label>
+                            <h2 style="display: inline; margin-left:15px;">
+                                <?php echo number_format($projectBudget); ?> บาท
+                            </h2>
+                        </div>
+                        <div class="content">
+                            <label class="form-label" for="projectName" style="display: inline;">งบประมาณที่ใช้ไป: </label>
+                            <h2 style="display: inline; margin-left:15px;">
+                                <?php echo number_format($totalBudgetUsed); ?> บาท
+                            </h2>
                         </div>
                         <div class="content">
                             <label class="form-label" for="projectName" style="display: inline;">ข้อมูลเพิ่มเติม: </label>
                             <p style="display: inline; font-size:16px;  margin-left:15px; "><?php echo $projectDescription; ?></p>
                         </div>
                         <div class="content">
-                            <label class="form-label" for="form-label">PDF File:</label>
+                            <label class="form-label" for="form-label">รายละเอียดการอบรม PDF:</label>
                             <?php
-                            if ($projectPdf !== null){
-                               echo '<embed type="application/pdf" src="data:application/pdf;base64,' . $pdfBase64 . '" width="100%" height="600px" />'; 
+                            if ($projectPdf !== null) {
+                                echo '<embed type="application/pdf" src="data:application/pdf;base64,' . $pdfBase64 . '" width="100%" height="600px" />';
                             } else {
                                 echo '<h2  style="display: inline;  margin-left:15px;">No file</h2>';
                             }
                             ?>
-                           
+
                             <br>
                         </div>
                         <div class="row mt-4">
@@ -172,33 +196,33 @@ include "../auth/checklogin.php";
                                         </div>
                                         <div class="modal-body" style="padding: 0px;">
                                             <?php
-                                            include '../connect.php';
                                             $con = mysqli_connect($servername, $username, $password, $dbname);
                                             if (isset($_GET['page'])) {
                                                 $sql = "SELECT
-                                    members.id,
-                                    members.firstname,
-                                    members.surname,
-                                    members.branch_id as memberB_id,
-                                    branch.branch_name,
-                                    branch.branch_id,
-                                    (
-                                        SELECT COUNT(members.id)
-                                        FROM project_user
-                                        JOIN members ON members.id = project_user.user_id
-                                        WHERE project_user.project_id = project.project_id
-                                    ) AS memberCount,
-                                    (
-                                        SELECT COUNT(DISTINCT members.branch_id)
-                                        FROM project_user
-                                        JOIN members ON members.id = project_user.user_id
-                                        WHERE project_user.project_id = project.project_id
-                                    ) AS branchCount
-                                    FROM project
-                                    JOIN project_user ON project_user.project_id = project.project_id
-                                    JOIN members ON members.id = project_user.user_id
-                                    JOIN branch ON branch.branch_id = members.branch_id
-                                    WHERE project.project_id = '$id'";
+                                                members.id,
+                                                members.firstname,
+                                                members.surname,
+                                                members.branch_id as memberB_id,
+                                                branch.branch_name,
+                                                branch.branch_id,
+                                                project_user.train,
+                                                (
+                                                    SELECT COUNT(members.id)
+                                                    FROM project_user
+                                                    JOIN members ON members.id = project_user.user_id
+                                                    WHERE project_user.project_id = project.project_id
+                                                ) AS memberCount,
+                                                (
+                                                    SELECT COUNT(DISTINCT members.branch_id)
+                                                    FROM project_user
+                                                    JOIN members ON members.id = project_user.user_id
+                                                    WHERE project_user.project_id = project.project_id
+                                                ) AS branchCount
+                                                FROM project
+                                                JOIN project_user ON project_user.project_id = project.project_id
+                                                JOIN members ON members.id = project_user.user_id
+                                                JOIN branch ON branch.branch_id = members.branch_id
+                                                WHERE project.project_id = '$id'";
                                                 $result = mysqli_query($con, $sql);
 
                                                 if ($result) {
@@ -210,6 +234,7 @@ include "../auth/checklogin.php";
                                                         $memberFirstname = $row['firstname'];
                                                         $memberSurname = $row['surname'];
                                                         $memberCount = $row['memberCount'];
+                                                        $memberTrain = $row['train'];
 
                                                         if (!isset($branchData[$branchId])) {
                                                             $branchData[$branchId] = array(
@@ -221,7 +246,8 @@ include "../auth/checklogin.php";
                                                         $branchData[$branchId]['members'][] = array(
                                                             'member_id' => $memberId,
                                                             'firstname' => $memberFirstname,
-                                                            'surname' => $memberSurname
+                                                            'surname' => $memberSurname,
+                                                            'train' => $memberTrain
                                                         );
                                             ?>
 
@@ -230,7 +256,7 @@ include "../auth/checklogin.php";
                                                         echo '<div class="p-4">';
                                                         echo '<h3>' . $branch['branch_name'] . '</h3>';
                                                         foreach ($branch['members'] as $member) {
-                                                            echo $member['firstname'] . ' ' . $member['surname'] . '<br>';
+                                                            echo $member['firstname'] . ' ' . $member['surname'] . ' ' . ($member['train'] == 0 ? '(ไม่ไป)' : '(ไป)') . '<br>';
                                                         }
                                                         echo '</div>';
                                                     }
@@ -243,7 +269,6 @@ include "../auth/checklogin.php";
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-
                                         </div>
                                     </div>
                                 </div>
