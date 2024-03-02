@@ -47,6 +47,19 @@ include "../auth/checklogin.php";
         .content {
             margin-top: 10px;
         }
+
+        .member-info {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .not-going {
+            color: red;
+        }
+
+        .going {
+            color: green;
+        }
     </style>
 </head>
 
@@ -73,6 +86,7 @@ include "../auth/checklogin.php";
                     $result = mysqli_query($con, $sql);
                     if ($result) {
                         $row = mysqli_fetch_assoc($result);
+                        $projectId = $row['project_id'];
                         $projectName = $row['project_name'];
                         $projectLevel = $row['level'];
                         $projectStatus = $row['status'];
@@ -84,10 +98,10 @@ include "../auth/checklogin.php";
                         $totalBudgetUsed = 0;
                         $sql1 = "SELECT * FROM project_user WHERE project_id = $id";
                         $result1 = mysqli_query($con, $sql1);
-                        
+
                         while ($row1 = mysqli_fetch_assoc($result1)) {
                             $budgetUsed = $row1['budget_user_used'];
-                            
+
                             // Display or use $budgetUsed as needed
                             $totalBudgetUsed += $budgetUsed;
                         }
@@ -206,6 +220,8 @@ include "../auth/checklogin.php";
                                                 branch.branch_name,
                                                 branch.branch_id,
                                                 project_user.train,
+                                                project_user.file_name,
+                                                project_user.file_content,
                                                 (
                                                     SELECT COUNT(members.id)
                                                     FROM project_user
@@ -222,7 +238,7 @@ include "../auth/checklogin.php";
                                                 JOIN project_user ON project_user.project_id = project.project_id
                                                 JOIN members ON members.id = project_user.user_id
                                                 JOIN branch ON branch.branch_id = members.branch_id
-                                                WHERE project.project_id = '$id'";
+                                                WHERE project.project_id = '$id' ORDER BY branch.branch_id";
                                                 $result = mysqli_query($con, $sql);
 
                                                 if ($result) {
@@ -235,6 +251,8 @@ include "../auth/checklogin.php";
                                                         $memberSurname = $row['surname'];
                                                         $memberCount = $row['memberCount'];
                                                         $memberTrain = $row['train'];
+                                                        $memberFileName = $row['file_name'];
+                                                        $memberFileContent = $row['file_content'];
 
                                                         if (!isset($branchData[$branchId])) {
                                                             $branchData[$branchId] = array(
@@ -247,7 +265,9 @@ include "../auth/checklogin.php";
                                                             'member_id' => $memberId,
                                                             'firstname' => $memberFirstname,
                                                             'surname' => $memberSurname,
-                                                            'train' => $memberTrain
+                                                            'train' => $memberTrain,
+                                                            'file_content' => $memberFileContent,
+                                                            'file_name' => $memberFileName
                                                         );
                                             ?>
 
@@ -256,7 +276,14 @@ include "../auth/checklogin.php";
                                                         echo '<div class="p-4">';
                                                         echo '<h3>' . $branch['branch_name'] . '</h3>';
                                                         foreach ($branch['members'] as $member) {
-                                                            echo $member['firstname'] . ' ' . $member['surname'] . ' ' . ($member['train'] == 0 ? '(ไม่ไป)' : '(ไป)') . '<br>';
+                                                            echo '<div class="member-info">';
+                                                            $colorClass = ($member['train'] == 0 ? 'not-going' : 'going');
+                                                            echo '<span class="' . $colorClass . '">' . $member['firstname'] . ' ' . $member['surname'] . ' ' . ($member['train'] == 0 ? '(ไม่ไป)' : '(ไป)') . '</span>';
+
+                                                            if ($member['file_content'] !== null) {
+                                                                echo '<a href="download.php?id=' . $member['member_id'] . '&project_id=' . $projectId  . '">Download File</a>';
+                                                            }
+                                                            echo '</div><br>';
                                                         }
                                                         echo '</div>';
                                                     }

@@ -235,7 +235,7 @@ include "../auth/checklogin.php";
                 <?php
                 include '../connect.php';
                 $con = mysqli_connect($servername, $username, $password, $dbname);
-                $sql = "SELECT * FROM members ORDER BY branch_id";
+                $sql = "SELECT members.*, role_user.* FROM members LEFT JOIN role_user ON members.id = role_user.user_id WHERE role_user.role_id != 1  ORDER BY branch_id";
                 $stmt = mysqli_prepare($con, $sql);
                 $stmt->execute();
                 mysqli_stmt_execute($stmt);

@@ -53,7 +53,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
                 }, function() {
                     window.location = "../page/home.php"; //หน้าที่ต้องการให้กระโดดไป
                 });
-            }, 1000);
+            }, 500);
             </script>';
         } 
         else {
@@ -68,7 +68,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
                 }, function() {
                     window.location = "login.php"; //หน้าที่ต้องการให้กระโดดไป
                 });
-            }, 1000);
+            }, 500);
             </script>';
         }
     } else {
@@ -83,7 +83,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
             }, function() {
                 window.location = "login.php"; //หน้าที่ต้องการให้กระโดดไป
             });
-        }, 1000);
+        }, 500);
         </script>';
     }
 

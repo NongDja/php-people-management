@@ -124,6 +124,7 @@ include "../auth/checklogin.php";
                     if ($result) {
 
                         $membersRow  = mysqli_fetch_assoc($result);
+                        $memberBranch = $membersRow['branch_id'];
                     } else {
                         echo "Error: " . mysqli_error($con);
                     }
@@ -167,7 +168,7 @@ include "../auth/checklogin.php";
                         <div class="col-sm-6 flex-column d-flex">
                             <label class="form-control-label px-3 pb-1">Role<span class="text-danger"> *</span></label>
 
-                            <select required name="role" onchange="showRole(this.value)" class="form-control select2" style="width: 100%; padding: 8px 15px; font-size: 18px">
+                            <select required name="role" onchange="showRole(this.value)" class="form-control select2" style="width: 100%; padding: 8px 15px; font-size: 18px; margin-top: 5px; height: 45px;">
                                 <?php foreach ($roleResult as $item) { ?>
                                     <option value="<?php echo $item['name']; ?>" <?php echo ($membersRow['name'] == $item['name']) ? 'selected' : ''; ?>><?php echo $item['name']; ?></option>
                                 <?php } ?>
@@ -183,11 +184,33 @@ include "../auth/checklogin.php";
                         <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">Phone number<span class="text-danger"> *</span></label> <input value="<?php echo $membersRow["phone"] ?>"  type="text" id="mob" name="mob" placeholder=""> </div>
                     </div>
                     <div class="row justify-content-between text-left p-4">
-                        <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">Job title<span class="text-danger"> *</span></label> <input type="text" id="job" name="job" placeholder=""> </div>
-                    </div>
-                    <div class="row justify-content-between text-left p-4">
-                        <div class="form-group col-12 flex-column d-flex"> <label class="form-control-label px-3 pb-1">What would you be using Flinks for?<span class="text-danger"> *</span></label> <input type="text" id="ans" name="ans" placeholder=""> </div>
-                    </div>
+                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">เลือกสาขา<span class="text-danger"> *</span></label>
+                                    <select required name="branch" class="form-control select2" style="width: 100%; padding: 8px 15px; font-size: 18px; margin-top: 5px; height: 50px;">
+                                        <option value="" disabled selected>เลือกสาขา</option>
+                                        <?php
+                                        include '../connect.php';
+                                        $con = mysqli_connect($servername, $username, $password, $dbname);
+                                        $sql = "SELECT * FROM branch";
+                                        $branchResult = mysqli_query($con, $sql);
+
+                                        while ($row = mysqli_fetch_assoc($branchResult)) {
+                                            $branchId = $row['branch_id'];
+                                            $branchName = $row['branch_name'];
+                                            $selected = ($memberBranch == $branchId) ? 'selected' : '';
+                                        ?>
+                                            <option class="dropdown-item text-capitalize" value="<?php echo $branchId; ?>" <?php echo $selected; ?>>
+                                                <?php echo $branchId . ' - ' . $branchName; ?>
+                                            </option>
+                                        <?php
+                                        }
+                                        // Close the result set
+
+                                        ?>
+                                    </select>
+                                </div>
+
+                            </div>
+                   
                     <div class="row justify-content-end">
                         <div class="d-grid gap-2" style="padding-left: 80px; padding-right: 80px;"> <button type="submit" class="btn-block btn-primary">Submit</button> </div>
                     </div>

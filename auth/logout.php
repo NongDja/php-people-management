@@ -16,6 +16,6 @@ setTimeout(function() {
     }, function() {
         window.location = "../index.php"; //หน้าที่ต้องการให้กระโดดไป
     });
-}, 1000);
+}, 500);
 </script>';
 ?>

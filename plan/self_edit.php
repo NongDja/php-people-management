@@ -83,13 +83,9 @@ $userId = $_SESSION['userId']
             box-shadow: none !important;
             outline-width: 0
         }
-
-
-
         .back:hover svg {
             transform: scale(1.2);
         }
-
         .back:hover svg path {
             fill: #ff0000;
         }
@@ -130,6 +126,7 @@ $userId = $_SESSION['userId']
             try {
                 // Update project table
                 if (isset($newPdfFile) && $_FILES["newPdfFile"]["error"] == UPLOAD_ERR_OK) {
+
                     $pdfContent = file_get_contents($newPdfFile);
                     $pdfContent = mysqli_real_escape_string($conn, $pdfContent);
                     $sqlUpdateProject = "UPDATE project SET project_name = '$plan', level = '$level', deadline = '$date', description = '$description',status = '$status' , pdf_data = '$pdfContent' WHERE project_id = '$id'";
@@ -140,17 +137,26 @@ $userId = $_SESSION['userId']
                 }
 
                 if (!$resultUpdateProject) {
-                    // Rollback the transaction if the update fails
                     mysqli_rollback($conn);
                     die('Error updating project: ' . mysqli_error($conn));
                 }
-
+                if(isset($_FILES['userFile']) && $_FILES['userFile']['error'] == UPLOAD_ERR_OK) {
+                    $file_name = $_FILES["userFile"]["name"];
+                    $file_tmp = $_FILES["userFile"]["tmp_name"];
+                    $file_content = file_get_contents($file_tmp);
+                    $file_content = mysqli_real_escape_string($conn, $file_content);
+                    $file_name = mysqli_real_escape_string($conn, $file_name);
+                    $sqlProjectUser = "UPDATE project_user SET train = $train, budget_user_used = $budgetUserUsed, file_name =  '$file_name' , file_content = '$file_content' WHERE project_id = '$id' AND user_id = $userId";
+                    $resultProjectUser = mysqli_query($conn, $sqlProjectUser);
+                }
+                else {
+                    $sqlProjectUser = "UPDATE project_user SET train = $train, budget_user_used = $budgetUserUsed WHERE project_id = '$id' AND user_id = $userId";
+                    $resultProjectUser = mysqli_query($conn, $sqlProjectUser);
+                }
                 // Insert into project_user table for each selected user
-                $sqlProjectUser = "UPDATE project_user SET train = $train, budget_user_used = $budgetUserUsed WHERE project_id = '$id' AND user_id = $userId";
-                $resultProjectUser = mysqli_query($conn, $sqlProjectUser);
+               
 
                 if (!$resultProjectUser) {
-                    // Rollback the transaction if the insert fails
                     mysqli_rollback($conn);
                     die('Error inserting project_user record: ' . mysqli_error($conn));
                 }
@@ -171,7 +177,6 @@ $userId = $_SESSION['userId']
                 </script>';
                 exit(); // Exit the script if any user insertion fails
             } catch (Exception $e) {
-                // Rollback the transaction in case of an exception
                 mysqli_rollback($conn);
                 die('Transaction failed: ' . $e->getMessage());
             }
@@ -284,9 +289,7 @@ $userId = $_SESSION['userId']
 
 
                             <div class="row justify-content-between text-left p-4">
-                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ข้อมูลเพิ่มเติม<span class="text-danger"> *</span></label>
-                                    <textarea name="description" id="" cols="30" rows="4"><?php echo  $projectDescription ?> </textarea>
-                                </div>
+                                
                                 <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">การไปอบรม<span class="text-danger"> *</span></label>
                                     <select required name="train" class="form-control select2" style="width: 100%; padding: 8px 15px; font-size: 18px;  margin-top: 5px; height: 50px;">
                                         <option value="" disabled selected>การไปอบรม</option>
@@ -299,6 +302,10 @@ $userId = $_SESSION['userId']
                                         <?php } ?>
                                     </select>
                                 </div>
+
+                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ใบรับรองการอบรม<span class="text-danger"> *</span></label>
+                                    <input type="file" name="userFile" accept=".pdf, .rar, .zip" />
+                                </div>
                             </div>
 
                             <div class="row justify-content-between text-left p-4">
@@ -307,7 +314,7 @@ $userId = $_SESSION['userId']
                                 </div>
                                 <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">Status<span class="text-danger"> *</span></label>
                                     <select required name="status" class="form-control select2" style="width: 100%; padding: 8px 15px; font-size: 18px;  margin-top: 5px; height: 50px;">
-                                        <option value="" disabled selected>Select Level</option>
+                                        <option value="" disabled selected>Select Status</option>
                                         <?php
                                         $statusMapping = ['Success' => 1, 'In Progess' => 2, 'Failed' => 3];
                                         foreach ($statusMapping as $statusName => $numericValue) {
@@ -318,7 +325,11 @@ $userId = $_SESSION['userId']
                                     </select>
                                 </div>
                             </div>
-
+                            <div class="row justify-content-between text-left p-4">
+                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ข้อมูลเพิ่มเติม<span class="text-danger"> *</span></label>
+                                    <textarea name="description" id="" cols="30" rows="4"><?php echo  $projectDescription ?> </textarea>
+                                </div>
+                            </div>
                             <div class="row justify-content-end">
                                 <div class="d-grid gap-2" style="padding-left: 80px; padding-right: 80px;"> <button type="submit" class="btn-block btn-primary">Submit</button> </div>
                             </div>

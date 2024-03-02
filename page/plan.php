@@ -411,7 +411,7 @@ $userId = $_SESSION['userId']
                             $projectDate = $project['deadline'];
                             $projectOrganizeName = $project['or_name'];
 
-                            $userQuery = "SELECT members.image_data 
+                            $userQuery = "SELECT project_user.user_id,members.image_data, project_user.file_name
                             FROM members 
                             JOIN project_user ON members.id = project_user.user_id
                             WHERE project_user.project_id = ?
@@ -423,7 +423,22 @@ $userId = $_SESSION['userId']
                             mysqli_stmt_execute($userStmt);
                             $userResult = mysqli_stmt_get_result($userStmt);
                             $dateTime = new DateTime($projectDate);
-                            $formattedDate = $dateTime->format('d F Y'); ?>
+                            $formattedDate = $dateTime->format('d F Y');
+                            $userFileCon = 0;
+                            $userCount = 0;
+                            while ($Count = mysqli_fetch_assoc($userResult)) {
+                                $userAwaitCount = $Count['user_id'];
+                                $file_name = $Count['file_name'];
+                                if($userAwaitCount) {
+                                    $userCount++;
+                                }
+                                if($file_name != null) {
+                                    $userFileCon++;
+                                }  
+                            }
+                            $Process = ($userCount > 0) ? ($userFileCon / $userCount * 100) : 0;
+                            mysqli_data_seek($userResult, 0);
+                           ?>
                             <div class="projectCard projectCard2">
                                 <div class="projectTop">
 
@@ -435,8 +450,8 @@ $userId = $_SESSION['userId']
 
                                             <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                                                 <li><a class="dropdown-item" href="<?php if ($_SESSION['role'] != 3) { ?>../plan/plan_edit.php?page=<?php echo $projectId;
-                                                                                    } else { ?>../plan/self_edit.php?page=<?php echo $projectId;
-                                                                                    } ?>">แก้ไข</a></li>
+                                                                                                                                                } else { ?>../plan/self_edit.php?page=<?php echo $projectId;
+                                                                                                                                                } ?>">แก้ไข</a></li>
                                                 <?php if ($_SESSION['role'] != 3) { ?>
                                                     <li><a class="dropdown-item" onclick="confirmDelete(<?php echo $projectId; ?>)">ลบ</a></li>
                                                 <?php    }
@@ -456,9 +471,9 @@ $userId = $_SESSION['userId']
                                     </div>
                                 </div>
                                 <div class="task">
-                                    <h2>Task Done: <bold><?php echo $projectProcess ?></bold> / 100</h2>
+                                    <h2>Task Done: <bold><?php echo $Process ?></bold> / 100</h2>
                                     <div class="progress" style="width: 100%;">
-                                        <div class="progress-bar <?= $projectProcess >= 80 ? 'bg-success' : ($projectProcess >= 25 ? 'bg-info' : 'bg-danger'); ?>" role="progressbar" style="width: <?php echo $projectProcess; ?>%;" aria-valuenow="<?php echo $projectProcess ?>" aria-valuemin="0" aria-valuemax="100"><?php echo $projectProcess ?>%</div>
+                                        <div class="progress-bar <?= $projectProcess >= 80 ? 'bg-success' : ($Process > 25 ? 'bg-info' : 'bg-danger'); ?>" role="progressbar" style="width: <?php echo $Process; ?>%;" aria-valuenow="<?php echo $Process ?>" aria-valuemin="0" aria-valuemax="100"><?php echo $Process ?>%</div>
                                     </div>
 
                                 </div>
@@ -470,9 +485,12 @@ $userId = $_SESSION['userId']
                                 <div class='groupImg'>
                                     <?php
                                     $j = 1;
+
                                     $pic = 0;
                                     while ($user = mysqli_fetch_assoc($userResult)) {
                                         $imageData = $user['image_data'];
+                                        $userAwaitCount = $user['user_id'];
+                                        $file_name = $user['file_name'];
                                         $altAttribute = "img$j";
 
                                         // Calculate left offset, but skip -10 for the first element
@@ -489,16 +507,20 @@ $userId = $_SESSION['userId']
                                             break;
                                         }
                                     }
+
                                     if ($j > 5) {
                                     ?>
                                         <a style="--left: -<?php echo ($j - 1) * 10; ?>px;     border: 3px solid #999;
                                         border-radius: 50%;
                                         background: #fff;">
-                                            <span class="number">+<?php echo $j - 4; ?></span>
+                                            <span class="number">+<?php echo $j - 5; ?></span>
                                         </a>
 
                                     <?php } ?>
+                                    <?php
+                                    // Now $userFileCon holds the count of non-null $file_name values
 
+                                    ?>
 
                                 </div>
                             </div>

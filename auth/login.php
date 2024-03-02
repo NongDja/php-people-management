@@ -64,11 +64,7 @@
 
                             </div>
 
-                            <!-- Checkbox -->
-                            <div class="form-check d-flex justify-content-start mb-4">
-                                <input class="form-check-input" type="checkbox" value="" id="form1Example3" />
-                                <label class="form-check-label" style="margin-left: 5px;" for="form1Example3"> Remember password </label>
-                            </div>
+                          
                             <div class="d-grid gap-2 mx-auto">
                             <button class="btn btn-primary btn-lg btn-block " type="submit">Login</button>
                             </div>

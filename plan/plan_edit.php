@@ -121,34 +121,18 @@ include "../auth/checklogin.php";
             mysqli_begin_transaction($conn);
 
             try {
-                    if (isset($newPdfFile) && $_FILES["newPdfFile"]["error"] == UPLOAD_ERR_OK) {
-                        
-                        $pdfContent = file_get_contents($newPdfFile);
-                        // Delete old records from project_user table for the specified project_id
-                        $sqlDeleteOld = "DELETE FROM project_user WHERE project_id = '$id'";
-                        $resultDeleteOld = mysqli_query($conn, $sqlDeleteOld);
+                if (isset($newPdfFile) && $_FILES["newPdfFile"]["error"] == UPLOAD_ERR_OK) {
 
-                        if (!$resultDeleteOld) {
-                            // Rollback the transaction if the delete fails
-                            mysqli_rollback($conn);
-                            die('Error deleting old project_user records: ' . mysqli_error($conn));
-                        }
-                        $pdfContent = mysqli_real_escape_string($conn, $pdfContent);
-                        $budget = mysqli_real_escape_string($conn, $budget);
-                        // Update project table
-                        $sqlUpdateProject = "UPDATE project SET project_name = '$plan', level = '$level', deadline = '$date', description = '$description',status = '$status' , process = $process, pdf_data = '$pdfContent', budget = '$budget'  WHERE project_id = '$id'";
-                        $resultUpdateProject = mysqli_query($conn, $sqlUpdateProject);
-                    }
-                     else {
+                    $pdfContent = file_get_contents($newPdfFile);
                     // Delete old records from project_user table for the specified project_id
-                    $sqlDeleteOld = "DELETE FROM project_user WHERE project_id = '$id'";
-                    $resultDeleteOld = mysqli_query($conn, $sqlDeleteOld);
+                    $pdfContent = mysqli_real_escape_string($conn, $pdfContent);
+                    $budget = mysqli_real_escape_string($conn, $budget);
+                    // Update project table
+                    $sqlUpdateProject = "UPDATE project SET project_name = '$plan', level = '$level', deadline = '$date', description = '$description',status = '$status' , process = $process, pdf_data = '$pdfContent', budget = '$budget'  WHERE project_id = '$id'";
+                    $resultUpdateProject = mysqli_query($conn, $sqlUpdateProject);
+                } else {
+                    // Delete old records from project_user table for the specified project_id
 
-                    if (!$resultDeleteOld) {
-                        // Rollback the transaction if the delete fails
-                        mysqli_rollback($conn);
-                        die('Error deleting old project_user records: ' . mysqli_error($conn));
-                    }
                     $budget = mysqli_real_escape_string($conn, $budget);
                     // Update project table
                     $sqlUpdateProject = "UPDATE project SET project_name = '$plan', level = '$level', deadline = '$date', description = '$description',status = '$status' , process = $process, budget = '$budget'  WHERE project_id = '$id'";
@@ -161,20 +145,53 @@ include "../auth/checklogin.php";
                     die('Error updating project: ' . mysqli_error($conn));
                 }
 
-                // Insert into project_user table for each selected user
-                foreach ($_POST['person'] as $userId) {
-                    $userId = mysqli_real_escape_string($conn, $userId);
+                $sqlExistingUsers = "SELECT user_id FROM project_user WHERE project_id = '$id'";
+                $resultExistingUsers = mysqli_query($conn, $sqlExistingUsers);
 
-                    $sqlProjectUser = "INSERT INTO project_user (project_id, user_id) VALUES ('$id', '$userId')";
-                    $resultProjectUser = mysqli_query($conn, $sqlProjectUser);
+                if (!$resultExistingUsers) {
+                    // Handle the error if the query fails
+                    die('Error checking existing project_user records: ' . mysqli_error($conn));
+                }
 
-                    if (!$resultProjectUser) {
-                        // Rollback the transaction if the insert fails
-                        mysqli_rollback($conn);
-                        die('Error inserting project_user record: ' . mysqli_error($conn));
+                // Create an array to store existing user IDs
+                $existingUserIds = array();
+
+                // Fetch existing user IDs and store them in the array
+                while ($rowExistingUsers = mysqli_fetch_assoc($resultExistingUsers)) {
+                    $existingUserIds[] = $rowExistingUsers['user_id'];
+                }
+
+                foreach ($existingUserIds as $existingUserId) {
+                    if (!in_array($existingUserId, $_POST['person'])) {
+                        // Delete the project_user record for the user not in $_POST['person']
+                        $sqlDeleteUser = "DELETE FROM project_user WHERE project_id = '$id' AND user_id = '$existingUserId'";
+                        $resultDeleteUser = mysqli_query($conn, $sqlDeleteUser);
+
+                        if (!$resultDeleteUser) {
+                            // Rollback the transaction if the delete fails
+                            mysqli_rollback($conn);
+                            die('Error deleting project_user record: ' . mysqli_error($conn));
+                        }
                     }
                 }
 
+                // Loop through the selected users from the form
+                foreach ($_POST['person'] as $userId) {
+                    $userId = mysqli_real_escape_string($conn, $userId);
+
+                    // Check if the user is already associated with the project
+                    if (!in_array($userId, $existingUserIds)) {
+                        // If not, insert the user into the project_user table
+                        $sqlProjectUser = "INSERT INTO project_user (project_id, user_id,train,budget_user_used) VALUES ('$id', '$userId',0 ,0)";
+                        $resultProjectUser = mysqli_query($conn, $sqlProjectUser);
+
+                        if (!$resultProjectUser) {
+                            // Rollback the transaction if the insert fails
+                            mysqli_rollback($conn);
+                            die('Error inserting project_user record: ' . mysqli_error($conn));
+                        }
+                    }
+                }
                 // Commit the transaction if all queries are successful
                 mysqli_commit($conn);
 
@@ -266,7 +283,7 @@ include "../auth/checklogin.php";
                                             $levelName = $row['or_name'];
                                             $selected = ($projectLevel == $levelId) ? 'selected' : '';
                                         ?>
-                                            <option class="dropdown-item text-capitalize" value="<?php echo $levelId; ?>" <?php echo $selected; ?> > 
+                                            <option class="dropdown-item text-capitalize" value="<?php echo $levelId; ?>" <?php echo $selected; ?>>
                                                 <?php echo $levelId . ' - ' . $levelName; ?>
                                             </option>
                                         <?php
@@ -307,7 +324,7 @@ include "../auth/checklogin.php";
                                             echo "Member ID: $memberId, Name: {$member['firstname']}, Email: {$member['surname']}<br>";
                                         }
 
-                                        $sql = "SELECT * FROM members ORDER BY branch_id";
+                                        $sql = "SELECT members.*, role_user.* FROM members LEFT JOIN role_user ON members.id = role_user.user_id WHERE role_user.role_id != 1  ORDER BY branch_id";
                                         $result = mysqli_query($con, $sql);
 
                                         while ($row = mysqli_fetch_assoc($result)) {
@@ -328,10 +345,10 @@ include "../auth/checklogin.php";
                                 </div>
                             </div>
                             <div class="row justify-content-between text-left p-4">
-                            <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">งบประมาณการอบรม<span class="text-danger"> *</span></label>
-                                    <input value="<?php echo $projectBudget;?>" name="budget" type="number">
+                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">งบประมาณการอบรม<span class="text-danger"> *</span></label>
+                                    <input value="<?php echo $projectBudget; ?>" name="budget" type="number">
                                 </div>
-                              
+
 
 
                                 <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">รายละเอียดการอบรม<span class="text-danger"> *</span></label>
@@ -358,10 +375,10 @@ include "../auth/checklogin.php";
                             </div>
 
                             <div class="row justify-content-between text-left p-4">
-                            <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ข้อมูลเพิ่มเติม<span class="text-danger"> *</span></label>
+                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ข้อมูลเพิ่มเติม<span class="text-danger"> *</span></label>
                                     <textarea name="description" id="" cols="30" rows="4"><?php echo  $projectDescription ?> </textarea>
                                 </div>
-                              
+
                             </div>
 
                             <div class="row justify-content-end">

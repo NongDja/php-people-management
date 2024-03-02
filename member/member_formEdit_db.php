@@ -13,7 +13,7 @@ $image_type = $_FILES["myfile"]["type"];
 $email = $_POST["email"];
 $mob = $_POST["mob"];
 $role = $_POST["role"];
-$job = $_POST["job"];
+$branch = $_POST["branch"];
 $defaultRoleId = 3;
 
 if ($image_name <> "") {
@@ -28,7 +28,7 @@ if (!$conn) {
 }
 
 
-$sql1 = "UPDATE members SET firstname = '$fname', surname = '$lname', email = '$email', phone = '$mob', image_data = '$image_data' WHERE id = $userId";
+$sql1 = "UPDATE members SET firstname = '$fname', surname = '$lname', email = '$email', phone = '$mob', image_data = '$image_data', branch_id = $branch WHERE id = $userId";
 $result1 = mysqli_query($conn, $sql1);
 
 $role_id = match ($role) {

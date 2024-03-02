@@ -213,15 +213,14 @@ include "../auth/checklogin.php";
                                         $con = mysqli_connect($servername, $username, $password, $dbname);
                                         if (isset($_GET['page'])) {
                                             $id = mysqli_real_escape_string($con, $_GET['page']);
-                                            $sql1 = "SELECT project_user.*, project.* 
+                                            $sql1 = "SELECT project_user.*, project.*
                                             FROM members
                                             LEFT JOIN project_user ON members.id = project_user.user_id
                                             LEFT JOIN project ON project_user.project_id = project.project_id
                                             WHERE id = '$id'";
                                             $result1 = mysqli_query($con, $sql1);
                                             if ($result1) {
-
-                                                $row = mysqli_fetch_assoc($result1);
+                                                $rowBranch = mysqli_fetch_assoc($result1);
                                             } else {
                                                 echo "Error: " . mysqli_error($con);
                                             }
