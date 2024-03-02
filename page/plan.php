@@ -573,6 +573,7 @@ $userId = $_SESSION['userId']
                                     $j = 0;
 
                                     $pic = 0;
+                                    $totalRows = mysqli_num_rows($userResult);
                                     while ($user = mysqli_fetch_assoc($userResult)) {
                                         $imageData = $user['image_data'];
                                         $userAwaitCount = $user['user_id'];
@@ -592,14 +593,14 @@ $userId = $_SESSION['userId']
                                         if ($pic >= 5) {
                                             break;
                                         }
-                                    }
-
-                                    if ($j > 5) {
+                                        }
+                            
+                                    if ($totalRows > 5) {
                                     ?>
-                                        <a style="--left: -<?php echo ($j - 1) * 10; ?>px;     border: 3px solid #999;
+                                        <a style="--left: -60px;     border: 3px solid #999;
                                         border-radius: 50%;
                                         background: #fff;">
-                                            <span class="number">+<?php echo $j - 5; ?></span>
+                                            <span class="number">+<?php echo $totalRows - 5; ?></span>
                                         </a>
 
                                     <?php } ?>
