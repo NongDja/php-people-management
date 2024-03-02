@@ -340,13 +340,13 @@ $userId = $_SESSION['userId']
             include "../component/navbar.php";
             include '../connect.php';
             $search = isset($_GET['search']) ? $_GET['search'] : '';
+            $branchFilter = isset($_GET['branch_filter']) ? $_GET['branch_filter'] : '';
             $con = mysqli_connect($servername, $username, $password, $dbname);
             $queryBranch = "SELECT * FROM branch";
             $stbh = mysqli_prepare($con, $queryBranch);
-            $stbh->execute();
             mysqli_stmt_execute($stbh);
             $resultBranch = mysqli_stmt_get_result($stbh);
-            $con->close()
+            $con->close();
             ?>
             <div class="container-fluid">
                 <div class="row mb-3">
@@ -366,18 +366,19 @@ $userId = $_SESSION['userId']
                             </div>
                             <div class="col-4 d-flex justify-content-end">
                                 <?php
-                                echo "<form class='input-group' method='get' action=''>";
-                                echo "<input style='background: #fff;' class='form-control' type='text' name='search' placeholder='Search by name' value='$search' />";
-                                echo "<div class='input-group-append'>";
-                                echo "<button class='btn btn-secondary' style='margin-top:2px; margin-left:2px;' type='submit'>";
-                                echo '<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
-                                <path d="M21 21l-6 -6" />
-                              </svg>';
-                                echo "</button>";
-                                echo "</div>";
-                                echo "</form>";
+                               echo "<form class='input-group' method='get' action=''>";
+                               echo "<input style='background: #fff;' class='form-control' type='text' name='search' placeholder='Search by name' value='$search' />";
+                               echo "<input type='hidden' name='branch_filter' value='$branchFilter' />";
+                               echo "<div class='input-group-append'>";
+                               echo "<button class='btn btn-secondary' style='margin-top:2px; margin-left:2px;' type='submit'>";
+                               echo '<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                     <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
+                                     <path d="M21 21l-6 -6" />
+                                   </svg>';
+                               echo "</button>";
+                               echo "</div>";
+                               echo "</form>";
                                 ?>
                             </div>
                             <div class="col-2 d-flex justify-content-end">
@@ -385,15 +386,20 @@ $userId = $_SESSION['userId']
                                     <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
                                         สาขา
                                     </button>
-                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                        <li><a class="dropdown-item" href="#">Action</a></li>
-                                        <li><a class="dropdown-item" href="#">Another action</a></li>
-                                        <li><a class="dropdown-item" href="#">Something else here</a></li>
-                                    </ul>
+                                    <div class="dropdown">
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                            <?php
+                                              echo "<li><a class='dropdown-item' href='?page=1&search={$search}&branch_filter='''  </a>All</li>";
+                                            while ($row = mysqli_fetch_assoc($resultBranch)) {
+                                                $selected = ($row['branch_id'] == $branchFilter) ? 'selected' : '';
+                                                echo "<li><a class='dropdown-item' href='?page=1&search={$search}&branch_filter={$row['branch_id']}' {$selected}>{$row['branch_name']}</a></li>";
+                                            }
+                                          
+                                            ?>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
-
-
 
                         </div>
                     </div>
@@ -418,9 +424,15 @@ $userId = $_SESSION['userId']
                         JOIN project_user ON project_user.project_id = project.project_id
                         JOIN organization ON project.level = organization.or_id
                         JOIN members ON members.id = project_user.user_id 
-                        WHERE project.project_id LIKE '%$search%' OR project.project_name LIKE '%$search%'  OR members.firstname LIKE '%$search%' OR members.surname LIKE '%$search%'
+                        JOIN branch ON branch.branch_id = members.branch_id
+                        WHERE (
+                            project.project_id LIKE '%$search%' 
+                            OR project.project_name LIKE '%$search%'  
+                            OR members.firstname LIKE '%$search%' 
+                            OR members.surname LIKE '%$search%'
+                        ) AND ('$branchFilter' = '' OR members.branch_id = '$branchFilter')
                         ORDER BY project.project_id DESC
-                        LIMIT $startFrom, $recordsPerPage";
+                        LIMIT $startFrom, $recordsPerPage;";
                     } else {
                         $sql = "SELECT DISTINCT project.project_id, 
                         (SELECT COUNT(DISTINCT project_user.project_id) 
@@ -431,8 +443,14 @@ $userId = $_SESSION['userId']
                         JOIN project_user ON project_user.project_id = project.project_id
                         JOIN organization ON project.level = organization.or_id
                         JOIN members ON members.id = project_user.user_id 
+                        JOIN branch ON branch.branch_id = members.branch_id
                         WHERE project_user.user_id = '$id' 
-                        AND (project.project_id LIKE '%$search%' OR project.project_name LIKE '%$search%')
+                        AND ( project.project_id LIKE '%$search%' 
+                            OR project.project_name LIKE '%$search%'  
+                            OR members.firstname LIKE '%$search%' 
+                            OR members.surname LIKE '%$search%'
+                            )
+                        AND members.branch_id = '$branchFilter'
                         ORDER BY project.project_id DESC
                         LIMIT $startFrom, $recordsPerPage";
                     }
@@ -449,7 +467,11 @@ $userId = $_SESSION['userId']
                             FROM project 
                             JOIN project_user ON project_user.project_id = project.project_id
                             JOIN members ON members.id = project_user.user_id
-                            WHERE (project.project_id LIKE '%$search%' OR project.project_name LIKE '%$search%' OR members.firstname LIKE '%$search%' OR members.surname LIKE '%$search%')";
+                            WHERE (project.project_id LIKE '%$search%' 
+                            OR project.project_name LIKE '%$search%' 
+                            OR members.firstname LIKE '%$search%' 
+                            OR members.surname LIKE '%$search%')
+                            AND ('$branchFilter' = '' OR members.branch_id = '$branchFilter')";
                         } else {
                             $queryCount = "SELECT COUNT(DISTINCT project.project_id) AS total 
                             FROM project 
@@ -463,10 +485,6 @@ $userId = $_SESSION['userId']
 
 
                         $totalPages = ceil($rowCount['total'] / $recordsPerPage);
-
-
-
-
 
                         while ($project = mysqli_fetch_assoc($result)) {
                             $projectId = $project['project_id'];
@@ -585,10 +603,6 @@ $userId = $_SESSION['userId']
                                         </a>
 
                                     <?php } ?>
-                                    <?php
-                                    // Now $userFileCon holds the count of non-null $file_name values
-
-                                    ?>
 
                                 </div>
                             </div>
@@ -599,15 +613,15 @@ $userId = $_SESSION['userId']
                         <nav aria-label="Page navigation example">
                             <ul class="pagination justify-content-end py-4">
                                 <li class="page-item <?php echo ($currentPage == 1) ? 'disabled' : ''; ?>">
-                                    <a href="?page=<?php echo ($currentPage - 1); ?>&search=<?php echo urlencode($search); ?>" aria-label="Previous" class="page-link">Previous</a>
+                                    <a href="?page=<?php echo ($currentPage - 1); ?>&search=<?php echo urlencode($search); ?>&branch_filter=<?php echo $branchFilter ?>" aria-label="Previous" class="page-link">Previous</a>
                                 </li>
                                 <?php for ($i = 1; $i <= $totalPages; $i++) { ?>
                                     <li class="page-item <?php echo ($i == $currentPage) ? 'active' : ''; ?>">
-                                        <a class="page-link" href="?page=<?php echo $i; ?>&search=<?php echo urlencode($search); ?>"><?php echo $i; ?></a>
+                                        <a class="page-link" href="?page=<?php echo $i; ?>&search=<?php echo urlencode($search) ?>&branch_filter=<?php echo $branchFilter ?>"><?php echo $i; ?></a>
                                     </li>
                                 <?php } ?>
                                 <li class="page-item <?php echo ($currentPage == $totalPages) ? 'disabled' : ''; ?>">
-                                    <a class="page-link" href="?page=<?php echo ($currentPage + 1); ?>&search=<?php echo urlencode($search); ?>" aria-label="Next">
+                                    <a class="page-link" href="?page=<?php echo ($currentPage + 1); ?>&search=<?php echo urlencode($search); ?>&branch_filter=<?php echo $branchFilter ?>" aria-label="Next">
                                         <span aria-hidden="true">Next</span>
                                     </a>
                                 </li>
