@@ -338,7 +338,15 @@ $userId = $_SESSION['userId']
         <div class="body-wrapper">
             <?php
             include "../component/navbar.php";
-
+            include '../connect.php';
+            $search = isset($_GET['search']) ? $_GET['search'] : '';
+            $con = mysqli_connect($servername, $username, $password, $dbname);
+            $queryBranch = "SELECT * FROM branch";
+            $stbh = mysqli_prepare($con, $queryBranch);
+            $stbh->execute();
+            mysqli_stmt_execute($stbh);
+            $resultBranch = mysqli_stmt_get_result($stbh);
+            $con->close()
             ?>
             <div class="container-fluid">
                 <div class="row mb-3">
@@ -356,8 +364,23 @@ $userId = $_SESSION['userId']
                                                                                     echo '../plan/self_add.php';
                                                                                 } ?>" class="btn btn-info">+เพิ่มข้อมูล</a></h3>
                             </div>
-                            <div class="col-6 d-flex justify-content-end">
-
+                            <div class="col-4 d-flex justify-content-end">
+                                <?php
+                                echo "<form class='input-group' method='get' action=''>";
+                                echo "<input style='background: #fff;' class='form-control' type='text' name='search' placeholder='Search by name' value='$search' />";
+                                echo "<div class='input-group-append'>";
+                                echo "<button class='btn btn-secondary' style='margin-top:2px; margin-left:2px;' type='submit'>";
+                                echo '<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
+                                <path d="M21 21l-6 -6" />
+                              </svg>';
+                                echo "</button>";
+                                echo "</div>";
+                                echo "</form>";
+                                ?>
+                            </div>
+                            <div class="col-2 d-flex justify-content-end">
                                 <div class="dropdown">
                                     <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
                                         สาขา
@@ -368,29 +391,50 @@ $userId = $_SESSION['userId']
                                         <li><a class="dropdown-item" href="#">Something else here</a></li>
                                     </ul>
                                 </div>
-
                             </div>
+
+
+
                         </div>
                     </div>
 
                     <?php
-                    include '../connect.php';
+
+                    $recordsPerPage = 9;
+
+                    // Get the current page number from the URL
+                    $currentPage = isset($_GET['page']) ? $_GET['page'] : 1;
+                    $startFrom = ($currentPage - 1) * $recordsPerPage;
+
+                    // Process the search query
+
                     $id = $_SESSION["userId"];
                     $con = mysqli_connect($servername, $username, $password, $dbname);
                     if ($_SESSION['role'] != 3) {
                         $sql = "SELECT DISTINCT project.project_id, 
                         (SELECT COUNT(DISTINCT project_user.project_id) FROM project_user) AS projectCount, 
-                        project.*,organization.or_name FROM project 
+                        project.*, organization.or_name 
+                        FROM project 
                         JOIN project_user ON project_user.project_id = project.project_id
                         JOIN organization ON project.level = organization.or_id
-                        JOIN members ON members.id = project_user.user_id ORDER BY project.project_id DESC";
+                        JOIN members ON members.id = project_user.user_id 
+                        WHERE project.project_id LIKE '%$search%' OR project.project_name LIKE '%$search%'  OR members.firstname LIKE '%$search%' OR members.surname LIKE '%$search%'
+                        ORDER BY project.project_id DESC
+                        LIMIT $startFrom, $recordsPerPage";
                     } else {
                         $sql = "SELECT DISTINCT project.project_id, 
-                        (SELECT COUNT(DISTINCT project_user.project_id) FROM project_user WHERE project_user.user_id = '$id') AS projectCount, 
-                        project.*,organization.or_name FROM project 
+                        (SELECT COUNT(DISTINCT project_user.project_id) 
+                         FROM project_user 
+                         WHERE project_user.user_id = '$id') AS projectCount, 
+                        project.*, organization.or_name 
+                        FROM project 
                         JOIN project_user ON project_user.project_id = project.project_id
                         JOIN organization ON project.level = organization.or_id
-                        JOIN members ON members.id = project_user.user_id WHERE project_user.user_id = '$id' ORDER BY project.project_id DESC";
+                        JOIN members ON members.id = project_user.user_id 
+                        WHERE project_user.user_id = '$id' 
+                        AND (project.project_id LIKE '%$search%' OR project.project_name LIKE '%$search%')
+                        ORDER BY project.project_id DESC
+                        LIMIT $startFrom, $recordsPerPage";
                     }
 
                     $stmt = mysqli_prepare($con, $sql);
@@ -400,6 +444,30 @@ $userId = $_SESSION['userId']
 
 
                     if (mysqli_num_rows($result) > 0) {
+                        if ($_SESSION['role'] != 3) {
+                            $queryCount = "SELECT COUNT(DISTINCT project.project_id) AS total 
+                            FROM project 
+                            JOIN project_user ON project_user.project_id = project.project_id
+                            JOIN members ON members.id = project_user.user_id
+                            WHERE (project.project_id LIKE '%$search%' OR project.project_name LIKE '%$search%' OR members.firstname LIKE '%$search%' OR members.surname LIKE '%$search%')";
+                        } else {
+                            $queryCount = "SELECT COUNT(DISTINCT project.project_id) AS total 
+                            FROM project 
+                            JOIN project_user ON project_user.project_id = project.project_id
+                            WHERE project_user.user_id = '$id'
+                            AND (project.project_id LIKE '%$search%' OR project.project_name LIKE '%$search%')";
+                        }
+
+                        $resultCount = $con->query($queryCount);
+                        $rowCount = $resultCount->fetch_assoc();
+
+
+                        $totalPages = ceil($rowCount['total'] / $recordsPerPage);
+
+
+
+
+
                         while ($project = mysqli_fetch_assoc($result)) {
                             $projectId = $project['project_id'];
                             $projectLevel = $project['level'];
@@ -429,16 +497,16 @@ $userId = $_SESSION['userId']
                             while ($Count = mysqli_fetch_assoc($userResult)) {
                                 $userAwaitCount = $Count['user_id'];
                                 $file_name = $Count['file_name'];
-                                if($userAwaitCount) {
+                                if ($userAwaitCount) {
                                     $userCount++;
                                 }
-                                if($file_name != null) {
+                                if ($file_name != null) {
                                     $userFileCon++;
-                                }  
+                                }
                             }
                             $Process = ($userCount > 0) ? ($userFileCon / $userCount * 100) : 0;
                             mysqli_data_seek($userResult, 0);
-                           ?>
+                    ?>
                             <div class="projectCard projectCard2">
                                 <div class="projectTop">
 
@@ -451,7 +519,7 @@ $userId = $_SESSION['userId']
                                             <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                                                 <li><a class="dropdown-item" href="<?php if ($_SESSION['role'] != 3) { ?>../plan/plan_edit.php?page=<?php echo $projectId;
                                                                                                                                                 } else { ?>../plan/self_edit.php?page=<?php echo $projectId;
-                                                                                                                                                } ?>">แก้ไข</a></li>
+                                                                                                                                                                                    } ?>">แก้ไข</a></li>
                                                 <?php if ($_SESSION['role'] != 3) { ?>
                                                     <li><a class="dropdown-item" onclick="confirmDelete(<?php echo $projectId; ?>)">ลบ</a></li>
                                                 <?php    }
@@ -484,7 +552,7 @@ $userId = $_SESSION['userId']
 
                                 <div class='groupImg'>
                                     <?php
-                                    $j = 1;
+                                    $j = 0;
 
                                     $pic = 0;
                                     while ($user = mysqli_fetch_assoc($userResult)) {
@@ -524,9 +592,32 @@ $userId = $_SESSION['userId']
 
                                 </div>
                             </div>
-                    <?php }
+                        <?php }
+                    }
+
+                    if (isset($totalPages) && $totalPages > 0) { ?>
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination justify-content-end py-4">
+                                <li class="page-item <?php echo ($currentPage == 1) ? 'disabled' : ''; ?>">
+                                    <a href="?page=<?php echo ($currentPage - 1); ?>&search=<?php echo urlencode($search); ?>" aria-label="Previous" class="page-link">Previous</a>
+                                </li>
+                                <?php for ($i = 1; $i <= $totalPages; $i++) { ?>
+                                    <li class="page-item <?php echo ($i == $currentPage) ? 'active' : ''; ?>">
+                                        <a class="page-link" href="?page=<?php echo $i; ?>&search=<?php echo urlencode($search); ?>"><?php echo $i; ?></a>
+                                    </li>
+                                <?php } ?>
+                                <li class="page-item <?php echo ($currentPage == $totalPages) ? 'disabled' : ''; ?>">
+                                    <a class="page-link" href="?page=<?php echo ($currentPage + 1); ?>&search=<?php echo urlencode($search); ?>" aria-label="Next">
+                                        <span aria-hidden="true">Next</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    <?php } else {
+                        echo "No results found.";
                     }
                     ?>
+
                 </div>
 
 
