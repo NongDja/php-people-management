@@ -99,23 +99,24 @@ else
             </div>
         </div>
         <?php
-        $sql2 = "select * from members ";
+        $sql2 = "SELECT COUNT(*) AS total FROM members LEFT JOIN branch ON members.branch_id = branch.branch_id WHERE members.firstname LIKE '%$search%'
+        OR members.id LIKE '%$search%' OR branch.branch_name LIKE '%$search%' ";
         $query2 = mysqli_query($con, $sql2);
-        $total_record = mysqli_num_rows($query2);
-        $total_page = ceil($total_record / $perpage);
+        $total_record = $query2->fetch_assoc();
+        $totalPages = ceil($total_record['total'] / $perpage);
         ?>
         <nav aria-label="Page navigation example">
             <ul class="pagination justify-content-end py-4">
                 <li class="page-item  <?php echo ($current_page == 1) ? 'disabled' : ''; ?>">
                     <a href="member_form.php?page=1" aria-label="Previous" class="page-link">Previous</a>
                 </li>
-                <?php for ($i = 1; $i <= $total_page; $i++) { ?>
+                <?php for ($i = 1; $i <= $totalPages; $i++) { ?>
                     <li class="page-item <?php echo ($i == $current_page) ? 'active' : ''; ?>">
                         <a class="page-link" href="member_form.php?page=<?php echo $i; ?>"><?php echo $i; ?></a>
                     </li>
                 <?php } ?>
-                <li class="page-item  <?php echo ($current_page == $total_page) ? 'disabled' : ''; ?>">
-                    <a class="page-link" href="member_form.php?page=<?php echo $total_page; ?>" aria-label="Next">
+                <li class="page-item  <?php echo ($current_page == $totalPages) ? 'disabled' : ''; ?>">
+                    <a class="page-link" href="member_form.php?page=<?php echo $totalPages; ?>" aria-label="Next">
                         <span aria-hidden="true">Next</span>
                     </a>
                 </li>

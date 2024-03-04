@@ -1,36 +1,47 @@
-
-
 <body>
-<aside class="left-sidebar">
-      <!-- Sidebar scroll-->
-      <div>
-        <div class="brand-logo d-flex align-items-center justify-content-between">
-          <a href="../page/home.php">
-            <img src="../image/easywork.png" style="margin-top: -40px; margin-bottom: -50px;" width="180" alt="" />
-          </a>
-          <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
-            <i class="ti ti-x fs-8"></i>
-          </div>
+  <aside class="left-sidebar">
+    <!-- Sidebar scroll-->
+    <div>
+      <div class="brand-logo d-flex align-items-center justify-content-between">
+        <a href="../page/home.php">
+          <img src="../image/easywork.png" style="margin-top: -40px; margin-bottom: -50px;" width="180" alt="" />
+        </a>
+        <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
+          <i class="ti ti-x fs-8"></i>
         </div>
-        <!-- Sidebar navigation-->
-        <nav class="sidebar-nav scroll-sidebar" data-simplebar="">
-          <ul id="sidebarnav">
+      </div>
+      <!-- Sidebar navigation-->
+      <nav class="sidebar-nav scroll-sidebar" data-simplebar="">
+        <ul id="sidebarnav">
           <?php
-                    // Check if the user is logged in
-                    if (isset($_SESSION['username'])) {
-                    ?>
-    <li class="nav-small-cap">
+          // Check if the user is logged in
+          if (isset($_SESSION['username'])) {
+          ?>
+            <li class="nav-small-cap">
               <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
               <span class="hide-menu">Home</span>
             </li>
             <li class="sidebar-item">
-              <a  class="sidebar-link <?php echo ($currentPage == 'home') ? 'active' : ''; ?>" href="../page/home.php" aria-expanded="false">
+              <a class="sidebar-link <?php echo ($currentPage == 'home') ? 'active' : ''; ?>" href="../page/home.php" aria-expanded="false">
+                <span>
+                  <i class="ti ti-timeline"></i>
+                </span>
+                <span class="hide-menu">Timeline</span>
+              </a>
+            </li>
+            <?php if($_SESSION['role'] == '1')  { ?>
+              <li class="sidebar-item">
+              <a class="sidebar-link <?php echo ($currentPage == 'dashboard') ? 'active' : ''; ?>" href="../page/dashboard.php" aria-expanded="false">
                 <span>
                   <i class="ti ti-layout-dashboard"></i>
+
                 </span>
                 <span class="hide-menu">Dashboard</span>
               </a>
             </li>
+              
+            <?php   }?>
+          
             <li class="nav-small-cap">
               <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
               <span class="hide-menu">Plan</span>
@@ -50,15 +61,8 @@
                 </span>
                 <span class="hide-menu">Alerts</span>
               </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="./ui-card.html" aria-expanded="false">
-                <span>
-                  <i class="ti ti-cards"></i>
-                </span>
-                <span class="hide-menu">Card</span>
-              </a>
             </li> -->
+
             <li class="sidebar-item">
               <a class="sidebar-link <?php echo ($currentPage == 'plan') ? 'active' : ''; ?>" href="../page/plan.php" aria-expanded="false">
                 <span>
@@ -87,13 +91,13 @@
                 <span class="hide-menu">Members</span>
               </a>
             </li>
-                   <?php } else { ?>
-                    <li class="nav-small-cap">
+          <?php } else { ?>
+            <li class="nav-small-cap">
               <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
               <span class="hide-menu">AUTH</span>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link"  href="../auth/login.php" aria-expanded="false">
+              <a class="sidebar-link" href="../auth/login.php" aria-expanded="false">
                 <span>
                   <i class="ti ti-login"></i>
                 </span>
@@ -108,19 +112,19 @@
                 <span class="hide-menu">Register</span>
               </a>
             </li> -->
-                 <?php   } ?>
-          </ul>
-         
-        </nav>
-        <!-- End Sidebar navigation -->
-      </div>
-      <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
+          <?php   } ?>
+        </ul>
+
+      </nav>
+      <!-- End Sidebar navigation -->
+    </div>
+    <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
     <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../assets/js/sidebarmenu.js"></script>
     <script src="../assets/js/app.min.js"></script>
 
-      <!-- End Sidebar scroll-->
-    </aside>
+    <!-- End Sidebar scroll-->
+  </aside>
 
-  
+
 </body>

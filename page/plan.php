@@ -209,7 +209,7 @@ $userId = $_SESSION['userId']
             border: 2px solid #f5b5f5;
             border-radius: 5px;
             font-size: 1.1em;
-            color: #f5b5f5;
+            color: #f460f4;
         }
 
 
@@ -363,7 +363,7 @@ $userId = $_SESSION['userId']
                                                                                 } else {
                                                                                     echo '../plan/self_add.php';
                                                                                 } ?>" class="btn btn-info">+เพิ่มข้อมูล</a></h3>
-                            </div>
+                          </div>
                             <div class="col-4 d-flex justify-content-end">
                                 <?php
                                echo "<form class='input-group' method='get' action=''>";
@@ -405,14 +405,10 @@ $userId = $_SESSION['userId']
                     </div>
 
                     <?php
-
                     $recordsPerPage = 9;
 
-                    // Get the current page number from the URL
                     $currentPage = isset($_GET['page']) ? $_GET['page'] : 1;
                     $startFrom = ($currentPage - 1) * $recordsPerPage;
-
-                    // Process the search query
 
                     $id = $_SESSION["userId"];
                     $con = mysqli_connect($servername, $username, $password, $dbname);
@@ -450,7 +446,7 @@ $userId = $_SESSION['userId']
                             OR members.firstname LIKE '%$search%' 
                             OR members.surname LIKE '%$search%'
                             )
-                        AND members.branch_id = '$branchFilter'
+                        AND  ('$branchFilter' = '' OR members.branch_id = '$branchFilter')
                         ORDER BY project.project_id DESC
                         LIMIT $startFrom, $recordsPerPage";
                     }
@@ -490,7 +486,6 @@ $userId = $_SESSION['userId']
                             $projectId = $project['project_id'];
                             $projectLevel = $project['level'];
                             $projectStatus = $project['status'];
-                            $projectProcess = $project['process'];
                             $projectCount = $project['projectCount'];
                             $projectName = $project['project_name'];
                             $projectDescription = $project['description'];
@@ -527,7 +522,6 @@ $userId = $_SESSION['userId']
                     ?>
                             <div class="projectCard projectCard2">
                                 <div class="projectTop">
-
                                     <a href="../plan/plan_detail.php?page=<?php echo $projectId ?>"><?php echo $projectName; ?><br><span> <?php echo (strlen($projectDescription) > 30) ? substr($projectDescription, 0, 30) . '...' : $projectDescription; ?></span></a>
                                     <div class="projectDots">
                                         <div class="dropdown">
@@ -545,8 +539,6 @@ $userId = $_SESSION['userId']
                                             </ul>
                                         </div>
                                     </div>
-
-
                                 </div>
                                 <div class="projectProgress">
                                     <div class="process" style=" <?php echo $projectStatus === 1 ? 'background: #dffde0;' : ($projectStatus === 2 ? 'background: #fdf5df;' : 'background: #fddfdf;') ?>">
@@ -559,13 +551,13 @@ $userId = $_SESSION['userId']
                                 <div class="task">
                                     <h2>Task Done: <bold><?php echo $Process ?></bold> / 100</h2>
                                     <div class="progress" style="width: 100%;">
-                                        <div class="progress-bar <?= $projectProcess >= 80 ? 'bg-success' : ($Process > 25 ? 'bg-info' : 'bg-danger'); ?>" role="progressbar" style="width: <?php echo $Process; ?>%;" aria-valuenow="<?php echo $Process ?>" aria-valuemin="0" aria-valuemax="100"><?php echo $Process ?>%</div>
+                                        <div class="progress-bar <?= $Process >= 80 ? 'bg-success' : ($Process > 25 ? 'bg-info' : 'bg-danger'); ?>" role="progressbar" style="width: <?php echo $Process; ?>%;" aria-valuenow="<?php echo $Process ?>" aria-valuemin="0" aria-valuemax="100"><?php echo $Process ?>%</div>
                                     </div>
 
                                 </div>
                                 <!-- <div class="divider"></div> -->
                                 <div class="due">
-                                    <h2>Due Date: <?php echo $formattedDate; ?></h2>
+                                    <h2>Date: <?php echo $formattedDate; ?></h2>
                                 </div>
 
                                 <div class='groupImg'>
@@ -602,9 +594,7 @@ $userId = $_SESSION['userId']
                                         background: #fff;">
                                             <span class="number">+<?php echo $totalRows - 5; ?></span>
                                         </a>
-
                                     <?php } ?>
-
                                 </div>
                             </div>
                         <?php }
@@ -632,7 +622,6 @@ $userId = $_SESSION['userId']
                         echo "No results found.";
                     }
                     ?>
-
                 </div>
 
 

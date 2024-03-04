@@ -23,6 +23,7 @@ include "../auth/checklogin.php";
         }
 
         .card {
+            min-height: 600px;
             padding: 30px 40px;
             margin-top: 30px;
             margin-bottom: 60px;
@@ -77,8 +78,9 @@ include "../auth/checklogin.php";
 
         .proile-rating {
             font-size: 12px;
-            color: #818182;
+            color: #000;
             margin-top: 5%;
+            font-weight: 600;
         }
 
         .proile-rating span {
@@ -156,6 +158,13 @@ include "../auth/checklogin.php";
         .back:hover svg path {
             fill: #ff0000;
         }
+
+        #scrollContainer {
+            max-height: 280px;
+            /* Set a max height for the container */
+            overflow-y: auto;
+            /* Enable vertical scrolling */
+        }
     </style>
 </head>
 
@@ -184,11 +193,27 @@ include "../auth/checklogin.php";
                             $con = mysqli_connect($servername, $username, $password, $dbname);
                             if (isset($_GET['page'])) {
                                 $id = mysqli_real_escape_string($con, $_GET['page']);
-                                $sql = "SELECT * FROM members WHERE id = '$id'";
+                                $sql = "SELECT
+                                members.*,
+                                branch.branch_name,
+                                COUNT(DISTINCT project_user.project_id) AS projectCount,
+                                COUNT(DISTINCT CASE WHEN project.status = 1 THEN project_user.project_id END) AS projectSuccessCount
+                                FROM
+                                members
+                                INNER JOIN role_user ON members.id = role_user.user_id
+                                INNER JOIN branch ON members.branch_id = branch.branch_id
+                                LEFT JOIN project_user ON members.id = project_user.user_id
+                                LEFT JOIN project ON project_user.project_id = project.project_id
+                                WHERE
+                                    members.id = $id
+                                GROUP BY
+                                    members.id, branch.branch_id;
+                                ";
                                 $result = mysqli_query($con, $sql);
                                 if ($result) {
-
                                     $row = mysqli_fetch_assoc($result);
+                                    $projectCount = $row['projectCount'];
+                                    $projectSuccess = $row['projectSuccessCount'];
                                 } else {
                                     echo "Error: " . mysqli_error($con);
                                 }
@@ -208,7 +233,7 @@ include "../auth/checklogin.php";
                                     <input type="file" name="file" />
                                 </div> -->
                                     </div>
-                                    <div class="profile-work">
+                                  
                                         <?php
                                         $con = mysqli_connect($servername, $username, $password, $dbname);
                                         if (isset($_GET['page'])) {
@@ -217,11 +242,9 @@ include "../auth/checklogin.php";
                                             FROM members
                                             LEFT JOIN project_user ON members.id = project_user.user_id
                                             LEFT JOIN project ON project_user.project_id = project.project_id
-                                            WHERE id = '$id'";
+                                            WHERE id = '$id' ORDER BY deadline DESC";
                                             $result1 = mysqli_query($con, $sql1);
-                                            if ($result1) {
-                                                $rowBranch = mysqli_fetch_assoc($result1);
-                                            } else {
+                                            if (!$result1) {
                                                 echo "Error: " . mysqli_error($con);
                                             }
                                             mysqli_close($con);
@@ -229,24 +252,7 @@ include "../auth/checklogin.php";
                                             echo "No 'id' parameter provided.";
                                         }
                                         ?>
-                                        <p>PLAN LINK</p>
-                                        <div class="link-container">
-                                            <a href="">Website Link</a><br />
-                                            <a href="">Bootsnipp Profile</a><br />
-                                            <a href="">Bootply Profile</a>
-                                            <a href="">Bootply Profile</a>
-                                            <a href="">Bootply Profile</a>
-                                            <a href="">Bootply Profile</a>
-                                            <a href="">Bootply Profile</a>
-
-                                        </div>
-                                        <p>SKILLS</p>
-                                        <a href="">Web Designer</a><br />
-                                        <a href="">Web Developer</a><br />
-                                        <a href="">Vue3</a><br />
-                                        <a href="">Angular</a><br />
-                                        <a href="">PHP, NodeJS</a><br />
-                                    </div>
+                                       
                                 </div>
                                 <div class="col-md-6">
                                     <div class="profile-head">
@@ -254,118 +260,145 @@ include "../auth/checklogin.php";
                                             <?= $row['firstname'] . ' ' . $row['surname']; ?>
                                         </h5>
                                         <h6>
-                                            สาขา <!--    Full Stack Web Developer -->
+                                            <?php echo $row['branch_name'] ?> <!--    Full Stack Web Developer -->
                                         </h6>
-                                        <p class="proile-rating">RANKINGS : <span>8/10</span></p>
+                                        <p class="proile-rating">Success Plan : <span><?php echo   $projectSuccess . ' / ' . $projectCount; ?> </span></p>
                                         <ul class="nav nav-tabs" id="myTab" role="tablist">
-                                            <li class="nav-item">
-                                                <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">About</a>
+                                            <li class="nav-item" role="presentation">
+                                                <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">About</button>
                                             </li>
-                                            <li class="nav-item">
-                                                <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Timeline</a>
+                                            <li class="nav-item" role="presentation">
+                                                <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">Plan</button>
                                             </li>
+
                                         </ul>
-                                    </div>
-                                    <div class="tab-content profile-tab" id="myTabContent">
-                                        <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <label>User Id</label>
+                                        <div class="tab-content profile-tab" id="myTabContent">
+                                            <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <label>User Id</label>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <p>No. <?php echo $id ?></p>
+                                                    </div>
                                                 </div>
-                                                <div class="col-md-6">
-                                                    <p>No. <?php echo $id ?></p>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <label>Fullname</label>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <p class="text-capitalize"> <?= $row['firstname'] . ' ' . $row['surname']; ?></p>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <label>Fullname</label>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <label>Email</label>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <p><?= $row['email'] ?></p>
+                                                    </div>
                                                 </div>
-                                                <div class="col-md-6">
-                                                    <p class="text-capitalize"> <?= $row['firstname'] . ' ' . $row['surname']; ?></p>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <label>Phone</label>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <?php
+                                                        $phone = $row['phone'];
+                                                        $formattedPhone = substr($phone, 0, 3) . ' ' . substr($phone, 3, 3) . ' ' . substr($phone, 6);
+                                                        ?>
+                                                        <p><?= $formattedPhone ?></p>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <label>Email</label>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <p><?= $row['email'] ?></p>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <label>Phone</label>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <?php
-                                                    $phone = $row['phone'];
-                                                    $formattedPhone = substr($phone, 0, 3) . ' ' . substr($phone, 3, 3) . ' ' . substr($phone, 6);
-                                                    ?>
-                                                    <p><?= $formattedPhone ?></p>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <label>Profession</label>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <p> Full Stack Web Developer</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <label>Experience</label>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <p>Expert</p>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <label>Profession</label>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <p> <?php echo $row['branch_name'] ?> </p>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <label>Hourly Rate</label>
+                                            <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                                                <div class="row">
+                                                    <div class="col-md-4">
+
+                                                        <label>ชื่อการอบรม</label>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <label>วันที่ไป</label>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <label>สถานะ</label>
+                                                    </div>
                                                 </div>
-                                                <div class="col-md-6">
-                                                    <p>10$/hr</p>
+                                                <div class="row mt-4" id="scrollContainer">
+                                                    <?php if($result1) { ?>
+
+                                                        <?php } ?>
+                                                    <div class="col-md-4">
+                                                        <?php
+                                                        while ($rowBranch = mysqli_fetch_assoc($result1)) {
+                                                            if( $rowBranch['project_name'] ) {
+                                                            echo '<label>' . $rowBranch['project_name'] . '</label> <br><br>';
+                                                            // You can access other fields using $rowBranch as well
+                                                            }
+                                                            else {
+                                                                echo '<label>ไม่มีข้อมูล</label>';
+                                                            }
+                                                        }
+                                                        mysqli_data_seek($result1, 0);
+                                                        ?>
+                                                    </div>
+
+                                                    <div class="col-md-4">
+                                                        <?php
+                                                        while ($rowBranch = mysqli_fetch_assoc($result1)) {
+                                                            if( $rowBranch['deadline'] ) {
+                                                                echo '<label style=" color: #0062cc;">' . $rowBranch['deadline'] . '</label> <br><br>';
+                                                                // You can access other fields using $rowBranch as well
+                                                            } else {
+                                                                echo '<label>ไม่มีข้อมูล</label>';
+                                                            }
+                                                          
+                                                        }
+                                                        mysqli_data_seek($result1, 0);
+                                                        ?>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <?php
+                                                        while ($rowBranch = mysqli_fetch_assoc($result1)) {
+                                                            if($rowBranch['status']) {
+                                                                $projectStatus = $rowBranch['status'];
+                                                          
+                                                            $statusColor = ($projectStatus == 1) ? 'color: #69bc72;' : (($projectStatus == 2) ? 'color: #e1701a;' : 'color: #ec0b0b;');
+                                                            $statusText = ($projectStatus == 1) ? 'Success' : (($projectStatus == 2) ? 'In Progress' : 'Failed');
+                                                          
+                                                            echo '<label style="' . $statusColor . '">' . $statusText . '</label><br><br>';
+                                                            // You can access other fields using $rowBranch as well  
+                                                            } else 
+                                                            {
+                                                                echo '<label>ไม่มีข้อมูล</label>';
+                                                            }
+                                                        }
+                                                        mysqli_data_seek($result1, 0);
+                                                        ?>
+                                                    </div>
+
+
                                                 </div>
+
                                             </div>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <label>Total Projects</label>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <p>230</p>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <label>English Level</label>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <p>Expert</p>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <label>Availability</label>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <p>6 months</p>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                    <label>Your Bio</label><br />
-                                                    <p>Your detail description</p>
-                                                </div>
-                                            </div>
+
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-2" style="  position: absolute; top:20px; right:20px">
+                                <?php if ($_SESSION["role"] == 1)  { ?> 
+                                    <div class="col-2" style="  position: absolute; top:20px; right:20px">
                                     <a href="../member/member_formEdit.php?page=<?= $_GET['page'] ?>" type="submit" class="profile-edit-btn btn btn-light" style="border-radius: 50px; font-size: 14px; color: gray; font-weight: 500;">Edit Profile</a>
                                 </div>
+                                    <?php } ?>
+                               
                             </div>
                             <div class="row">
                                 <div class="col-md-4">
@@ -381,6 +414,12 @@ include "../auth/checklogin.php";
             </div>
         </div>
     </div>
+    <script>
+        $(document).ready(function() {
+            var container = $('#scrollContainer');
+            container.scrollTop(container.scrollTop() + 5 * container.children().first().height());
+        });
+    </script>
     <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
     <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../assets/js/sidebarmenu.js"></script>

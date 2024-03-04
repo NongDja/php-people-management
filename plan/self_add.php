@@ -261,7 +261,7 @@ $userId = $_SESSION["userId"];
 
                             </div>
                             <div class="row justify-content-between text-left p-4">
-                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">Due Date<span class="text-danger"> *</span></label>
+                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">Date<span class="text-danger"> *</span></label>
                                     <input type="datetime-local" name="date" placeholder="Select Date">
                                 </div>
 

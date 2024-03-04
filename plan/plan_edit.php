@@ -114,7 +114,6 @@ include "../auth/checklogin.php";
             $date = $_POST['date'];
             $description = $_POST['description'];
             $status = $_POST['status'];
-            $process = $_POST['process'];
             $budget = $_POST['budget'];
             $newPdfFile = $_FILES["newPdfFile"]["tmp_name"]; // New file uploaded
             // Start a transaction for atomicity
@@ -128,14 +127,14 @@ include "../auth/checklogin.php";
                     $pdfContent = mysqli_real_escape_string($conn, $pdfContent);
                     $budget = mysqli_real_escape_string($conn, $budget);
                     // Update project table
-                    $sqlUpdateProject = "UPDATE project SET project_name = '$plan', level = '$level', deadline = '$date', description = '$description',status = '$status' , process = $process, pdf_data = '$pdfContent', budget = '$budget'  WHERE project_id = '$id'";
+                    $sqlUpdateProject = "UPDATE project SET project_name = '$plan', level = '$level', deadline = '$date', description = '$description',status = '$status', pdf_data = '$pdfContent', budget = '$budget'  WHERE project_id = '$id'";
                     $resultUpdateProject = mysqli_query($conn, $sqlUpdateProject);
                 } else {
                     // Delete old records from project_user table for the specified project_id
 
                     $budget = mysqli_real_escape_string($conn, $budget);
                     // Update project table
-                    $sqlUpdateProject = "UPDATE project SET project_name = '$plan', level = '$level', deadline = '$date', description = '$description',status = '$status' , process = $process, budget = '$budget'  WHERE project_id = '$id'";
+                    $sqlUpdateProject = "UPDATE project SET project_name = '$plan', level = '$level', deadline = '$date', description = '$description',status = '$status', budget = '$budget'  WHERE project_id = '$id'";
                     $resultUpdateProject = mysqli_query($conn, $sqlUpdateProject);
                 }
 
@@ -243,7 +242,6 @@ include "../auth/checklogin.php";
                         while ($project = mysqli_fetch_array($result)) {
                             $projectName = $project['project_name'];
                             $projectLevel = $project['level'];
-                            $projectProcess = $project['process'];
                             $projectStatus = $project['status'];
                             $projectDeadline = $project['deadline'];
                             $projectBudget = $project['budget'];
@@ -297,7 +295,7 @@ include "../auth/checklogin.php";
 
                             </div>
                             <div class="row justify-content-between text-left p-4">
-                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">Due Date<span class="text-danger"> *</span></label>
+                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">Date<span class="text-danger"> *</span></label>
                                     <input type="datetime-local" name="date" placeholder="Select Date">
                                 </div>
 
@@ -369,9 +367,7 @@ include "../auth/checklogin.php";
                                         <?php } ?>
                                     </select>
                                 </div>
-                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ความคืบหน้าของการอบรม<span class="text-danger"> *</span></label>
-                                    <input type="number" value="<?php echo $projectProcess; ?>" max="100" name="process">
-                                </div>
+                              
                             </div>
 
                             <div class="row justify-content-between text-left p-4">

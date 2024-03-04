@@ -214,7 +214,6 @@ $userId = $_SESSION['userId']
                             $projectName = $project['project_name'];
                             $projectLevel = $project['level'];
                             $projectStatus = $project['status'];
-                            $projectProcess = $project['process'];
                             $projectDeadline = $project['deadline'];
                             $projectDescription = $project['description'];
                             $projectTrain = $project['train'];
@@ -268,7 +267,7 @@ $userId = $_SESSION['userId']
 
                             </div>
                             <div class="row justify-content-between text-left p-4">
-                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">Due Date<span class="text-danger"> *</span></label>
+                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">Date<span class="text-danger"> *</span></label>
                                     <input type="datetime-local" name="date" placeholder="Select Date">
                                 </div>
 
@@ -309,9 +308,7 @@ $userId = $_SESSION['userId']
                             </div>
 
                             <div class="row justify-content-between text-left p-4">
-                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ความคืบหน้าของการอบรม<span class="text-danger"> *</span></label>
-                                    <input type="number" value="<?php echo $projectProcess; ?>" max="100" name="process">
-                                </div>
+                               
                                 <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">Status<span class="text-danger"> *</span></label>
                                     <select required name="status" class="form-control select2" style="width: 100%; padding: 8px 15px; font-size: 18px;  margin-top: 5px; height: 50px;">
                                         <option value="" disabled selected>Select Status</option>
@@ -324,12 +321,11 @@ $userId = $_SESSION['userId']
                                         <?php } ?>
                                     </select>
                                 </div>
-                            </div>
-                            <div class="row justify-content-between text-left p-4">
                                 <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ข้อมูลเพิ่มเติม<span class="text-danger"> *</span></label>
                                     <textarea name="description" id="" cols="30" rows="4"><?php echo  $projectDescription ?> </textarea>
                                 </div>
                             </div>
+                          
                             <div class="row justify-content-end">
                                 <div class="d-grid gap-2" style="padding-left: 80px; padding-right: 80px;"> <button type="submit" class="btn-block btn-primary">Submit</button> </div>
                             </div>
