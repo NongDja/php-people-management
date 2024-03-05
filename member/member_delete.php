@@ -17,7 +17,7 @@ if(isset($_GET['id'])) {
     echo '<script>
     setTimeout(function() {
         swal({
-            title: "ลบแล้วจ้า",
+            title: "Success",
             text: "Delete successful",
             type: "success",
         }, function() {

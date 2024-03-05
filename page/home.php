@@ -12,7 +12,13 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <title>Home</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-
+    <link href='fullcalendar/packages/core/main.css' rel='stylesheet' />
+    <link href='fullcalendar/packages/daygrid/main.css' rel='stylesheet' />
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    
+    <!-- Style -->
+    <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="../assets/css/styles.min.css" />
     <style>
         body {
@@ -32,184 +38,87 @@
         <div class="body-wrapper">
             <?php
             include "../component/navbar.php";
+            include "../connect.php";
+            $delete_id = ($_GET['id']);
+            $conn = mysqli_connect(
+                $servername,
+                $username,
+                $password,
+                $dbname
+            );
+            if (!$conn) {
+                die("error" . mysqli_connect_error());
+            }
+
+            $sql = "SELECT *
+            FROM project
+            WHERE deadline >= CURDATE() AND deadline <= DATE_ADD(CURDATE(), INTERVAL 1 YEAR)
+            ORDER BY deadline ASC;
+            ";
+            $result = mysqli_query($conn, $sql);
+            $borderClass = 'border-primary';
+
+            // Check status and update border class accordingly
+
             ?>
             <div class="container-fluid">
                 <?php if (isset($_SESSION['username'])) { ?>
-                        <div class="row">
-                            <div class="col-lg-4 d-flex align-items-stretch">
-                                <div class="card w-100">
-                                    <div class="card-body p-4">
-                                        <div class="mb-4">
-                                            <h5 class="card-title fw-semibold">Recent Timeline</h5>
-                                        </div>
-                                        <ul class="timeline-widget mb-0 position-relative mb-n5">
-                                            <li class="timeline-item d-flex position-relative overflow-hidden">
-                                                <div class="timeline-time text-dark flex-shrink-0 text-end">09:30</div>
-                                                <div class="timeline-badge-wrap d-flex flex-column align-items-center">
-                                                    <span class="timeline-badge border-2 border border-primary flex-shrink-0 my-8"></span>
-                                                    <span class="timeline-badge-border d-block flex-shrink-0"></span>
-                                                </div>
-                                                <div class="timeline-desc fs-3 text-dark mt-n1">Payment received from John Doe of $385.90</div>
-                                            </li>
-                                            <li class="timeline-item d-flex position-relative overflow-hidden">
-                                                <div class="timeline-time text-dark flex-shrink-0 text-end">10:00 am</div>
-                                                <div class="timeline-badge-wrap d-flex flex-column align-items-center">
-                                                    <span class="timeline-badge border-2 border border-info flex-shrink-0 my-8"></span>
-                                                    <span class="timeline-badge-border d-block flex-shrink-0"></span>
-                                                </div>
-                                                <div class="timeline-desc fs-3 text-dark mt-n1 fw-semibold">New sale recorded <a href="javascript:void(0)" class="text-primary d-block fw-normal">#ML-3467</a>
-                                                </div>
-                                            </li>
-                                            <li class="timeline-item d-flex position-relative overflow-hidden">
-                                                <div class="timeline-time text-dark flex-shrink-0 text-end">12:00 am</div>
-                                                <div class="timeline-badge-wrap d-flex flex-column align-items-center">
-                                                    <span class="timeline-badge border-2 border border-success flex-shrink-0 my-8"></span>
-                                                    <span class="timeline-badge-border d-block flex-shrink-0"></span>
-                                                </div>
-                                                <div class="timeline-desc fs-3 text-dark mt-n1">Payment was made of $64.95 to Michael</div>
-                                            </li>
-                                            <li class="timeline-item d-flex position-relative overflow-hidden">
-                                                <div class="timeline-time text-dark flex-shrink-0 text-end">09:30 am</div>
-                                                <div class="timeline-badge-wrap d-flex flex-column align-items-center">
-                                                    <span class="timeline-badge border-2 border border-warning flex-shrink-0 my-8"></span>
-                                                    <span class="timeline-badge-border d-block flex-shrink-0"></span>
-                                                </div>
-                                                <div class="timeline-desc fs-3 text-dark mt-n1 fw-semibold">New sale recorded <a href="javascript:void(0)" class="text-primary d-block fw-normal">#ML-3467</a>
-                                                </div>
-                                            </li>
-                                            <li class="timeline-item d-flex position-relative overflow-hidden">
-                                                <div class="timeline-time text-dark flex-shrink-0 text-end">09:30 am</div>
-                                                <div class="timeline-badge-wrap d-flex flex-column align-items-center">
-                                                    <span class="timeline-badge border-2 border border-danger flex-shrink-0 my-8"></span>
-                                                    <span class="timeline-badge-border d-block flex-shrink-0"></span>
-                                                </div>
-                                                <div class="timeline-desc fs-3 text-dark mt-n1 fw-semibold">New arrival recorded
-                                                </div>
-                                            </li>
-                                            <li class="timeline-item d-flex position-relative overflow-hidden">
-                                                <div class="timeline-time text-dark flex-shrink-0 text-end">12:00 am</div>
-                                                <div class="timeline-badge-wrap d-flex flex-column align-items-center">
-                                                    <span class="timeline-badge border-2 border border-success flex-shrink-0 my-8"></span>
-                                                </div>
-                                                <div class="timeline-desc fs-3 text-dark mt-n1">Payment Done</div>
-                                            </li>
-                                        </ul>
+                    <div class="row">
+                        <div class="col-lg-4 d-flex align-items-stretch">
+                            <div class="card w-100">
+                                <div class="card-body p-4">
+                                    <div class="mb-4">
+                                        <h5 class="card-title fw-semibold">Recent Timeline</h5>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-8 d-flex align-items-stretch">
-                                <div class="card w-100">
-                                    <div class="card-body p-4">
-                                        <h5 class="card-title fw-semibold mb-4">Recent Timeline</h5>
-                                        <div class="table-responsive">
-                                            <table class="table text-nowrap mb-0 align-middle">
-                                                <thead class="text-dark fs-4">
-                                                    <tr>
-                                                        <th class="border-bottom-0">
-                                                            <h6 class="fw-semibold mb-0">Id</h6>
-                                                        </th>
-                                                        <th class="border-bottom-0">
-                                                            <h6 class="fw-semibold mb-0">Assigned</h6>
-                                                        </th>
-                                                        <th class="border-bottom-0">
-                                                            <h6 class="fw-semibold mb-0">Name</h6>
-                                                        </th>
-                                                        <th class="border-bottom-0">
-                                                            <h6 class="fw-semibold mb-0">Priority</h6>
-                                                        </th>
-                                                        <th class="border-bottom-0">
-                                                            <h6 class="fw-semibold mb-0">Budget</h6>
-                                                        </th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td class="border-bottom-0">
-                                                            <h6 class="fw-semibold mb-0">1</h6>
-                                                        </td>
-                                                        <td class="border-bottom-0">
-                                                            <h6 class="fw-semibold mb-1">Sunil Joshi</h6>
-                                                            <span class="fw-normal">Web Designer</span>
-                                                        </td>
-                                                        <td class="border-bottom-0">
-                                                            <p class="mb-0 fw-normal">Elite Admin</p>
-                                                        </td>
-                                                        <td class="border-bottom-0">
-                                                            <div class="d-flex align-items-center gap-2">
-                                                                <span class="badge bg-primary rounded-3 fw-semibold">Low</span>
-                                                            </div>
-                                                        </td>
-                                                        <td class="border-bottom-0">
-                                                            <h6 class="fw-semibold mb-0 fs-4">$3.9</h6>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td class="border-bottom-0">
-                                                            <h6 class="fw-semibold mb-0">2</h6>
-                                                        </td>
-                                                        <td class="border-bottom-0">
-                                                            <h6 class="fw-semibold mb-1">Andrew McDownland</h6>
-                                                            <span class="fw-normal">Project Manager</span>
-                                                        </td>
-                                                        <td class="border-bottom-0">
-                                                            <p class="mb-0 fw-normal">Real Homes WP Theme</p>
-                                                        </td>
-                                                        <td class="border-bottom-0">
-                                                            <div class="d-flex align-items-center gap-2">
-                                                                <span class="badge bg-secondary rounded-3 fw-semibold">Medium</span>
-                                                            </div>
-                                                        </td>
-                                                        <td class="border-bottom-0">
-                                                            <h6 class="fw-semibold mb-0 fs-4">$24.5k</h6>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td class="border-bottom-0">
-                                                            <h6 class="fw-semibold mb-0">3</h6>
-                                                        </td>
-                                                        <td class="border-bottom-0">
-                                                            <h6 class="fw-semibold mb-1">Christopher Jamil</h6>
-                                                            <span class="fw-normal">Project Manager</span>
-                                                        </td>
-                                                        <td class="border-bottom-0">
-                                                            <p class="mb-0 fw-normal">MedicalPro WP Theme</p>
-                                                        </td>
-                                                        <td class="border-bottom-0">
-                                                            <div class="d-flex align-items-center gap-2">
-                                                                <span class="badge bg-danger rounded-3 fw-semibold">High</span>
-                                                            </div>
-                                                        </td>
-                                                        <td class="border-bottom-0">
-                                                            <h6 class="fw-semibold mb-0 fs-4">$12.8k</h6>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td class="border-bottom-0">
-                                                            <h6 class="fw-semibold mb-0">4</h6>
-                                                        </td>
-                                                        <td class="border-bottom-0">
-                                                            <h6 class="fw-semibold mb-1">Nirav Joshi</h6>
-                                                            <span class="fw-normal">Frontend Engineer</span>
-                                                        </td>
-                                                        <td class="border-bottom-0">
-                                                            <p class="mb-0 fw-normal">Hosting Press HTML</p>
-                                                        </td>
-                                                        <td class="border-bottom-0">
-                                                            <div class="d-flex align-items-center gap-2">
-                                                                <span class="badge bg-success rounded-3 fw-semibold">Critical</span>
-                                                            </div>
-                                                        </td>
-                                                        <td class="border-bottom-0">
-                                                            <h6 class="fw-semibold mb-0 fs-4">$2.4k</h6>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
+                                    <ul class="timeline-widget mb-0 position-relative">
+                                        <?php
+                                        $lastIteration = true;
+                                        $num = mysqli_num_rows($result);
+                                        while ($row = mysqli_fetch_assoc($result)) {
+                                            $status = $row['status'];
+                                            $originalDate = $row['deadline'];
+
+                                            if ($num == 1) {
+                                                $lastIteration = false;
+                                            }
+                                            if ($status == 1) {
+                                                $borderClass = 'border-success';
+                                            } elseif ($status == 2) {
+                                                $borderClass = 'border-warning';
+                                            } elseif ($status == 3) {
+                                                $borderClass = 'border-danger';
+                                            }
+
+                                            $formattedDate = date("d F Y", strtotime($originalDate));
+
+
+                                            // Output the formatted date
+                                        ?>
+                                            <li class="timeline-item d-flex position-relative overflow-hidden">
+                                                <div style="width: 150px;" class="timeline-time text-dark flex-shrink-0 text-end"><?php echo $formattedDate ?></div>
+                                                <div class="timeline-badge-wrap d-flex flex-column align-items-center">
+                                                    <span class="timeline-badge border-2 border <?php echo $borderClass; ?> flex-shrink-0 my-8"></span>
+                                                    <?php if ($lastIteration) : ?>
+                                                        <span class="timeline-badge-border d-block flex-shrink-0"></span>
+                                                    <?php endif; ?>
+                                                </div>
+                                                <div class="timeline-desc fs-3 text-dark mt-n1"><?php echo $row['project_name'] ?></div>
+                                            </li>
+                                        <?php
+                                            $num--;
+                                        } ?>
+
+
+
+
+                                    </ul>
                                 </div>
                             </div>
                         </div>
+                        <div class="content col-lg-8 p-0">
+                            <div id='calendar'></div>
+                        </div>
+                    </div>
                 <?php  } ?>
 
 
@@ -226,6 +135,80 @@
     <script src="../assets/libs/apexcharts/dist/apexcharts.min.js"></script>
     <script src="../assets/libs/simplebar/dist/simplebar.js"></script>
     <script src="../assets/js/dashboard.js"></script>
+
+    <script src='fullcalendar/packages/core/main.js'></script>
+    <script src='fullcalendar/packages/interaction/main.js'></script>
+    <script src='fullcalendar/packages/daygrid/main.js'></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                plugins: ['interaction', 'dayGrid'],
+                defaultDate: '2020-02-12',
+                editable: true,
+                eventLimit: true, // allow "more" link when too many events
+                events: [{
+                        title: 'All Day Event',
+                        start: '2020-02-01'
+                    },
+                    {
+                        title: 'Long Event',
+                        start: '2020-02-07',
+                        end: '2020-02-10'
+                    },
+                    {
+                        groupId: 999,
+                        title: 'Repeating Event',
+                        start: '2020-02-09T16:00:00'
+                    },
+                    {
+                        groupId: 999,
+                        title: 'Repeating Event',
+                        start: '2020-02-16T16:00:00'
+                    },
+                    {
+                        title: 'Conference',
+                        start: '2020-02-11',
+                        end: '2020-02-13'
+                    },
+                    {
+                        title: 'Meeting',
+                        start: '2020-02-12T10:30:00',
+                        end: '2020-02-12T12:30:00'
+                    },
+                    {
+                        title: 'Lunch',
+                        start: '2020-02-12T12:00:00'
+                    },
+                    {
+                        title: 'Meeting',
+                        start: '2020-02-12T14:30:00'
+                    },
+                    {
+                        title: 'Happy Hour',
+                        start: '2020-02-12T17:30:00'
+                    },
+                    {
+                        title: 'Dinner',
+                        start: '2020-02-12T20:00:00'
+                    },
+                    {
+                        title: 'Birthday Party',
+                        start: '2020-02-13T07:00:00'
+                    },
+                    {
+                        title: 'Click for Google',
+                        url: 'http://google.com/',
+                        start: '2020-02-28'
+                    }
+                ]
+            });
+
+            calendar.render();
+        });
+    </script>
 </body>
 
 </html>

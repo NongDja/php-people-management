@@ -252,7 +252,7 @@ include "../auth/checklogin.php";
                         <form class="form-card" action="" method="post" enctype="multipart/form-data">
 
                             <div class="row justify-content-between text-left p-4">
-                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ชื่อการอบรม<span class="text-danger"> *</span></label> <input type="text" required id="plan" name="plan" placeholder="Enter your plan"> </div>
+                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ชื่อการอบรม<span class="text-danger"> *</span></label> <input type="text" maxlength="50" required id="plan" name="plan" placeholder="Enter your plan"> </div>
                                 <div class="col-sm-6 flex-column d-flex">
                                     <label class="form-control-label px-3 pb-1">หน่วยงาน<span class="text-danger"> *</span></label>
 
