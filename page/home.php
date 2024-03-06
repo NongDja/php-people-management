@@ -16,13 +16,19 @@
     <link href='fullcalendar/packages/daygrid/main.css' rel='stylesheet' />
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="css/bootstrap.min.css">
-    
+
     <!-- Style -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="../assets/css/styles.min.css" />
     <style>
         body {
             background: #fafafa;
+        }
+
+        .timeline-widget {
+            max-height: 600px;
+            /* Adjust the maximum height as needed */
+            overflow-y: auto;
         }
     </style>
 </head>
@@ -39,7 +45,7 @@
             <?php
             include "../component/navbar.php";
             include "../connect.php";
-            $delete_id = ($_GET['id']);
+            // $delete_id = ($_GET['id']);
             $conn = mysqli_connect(
                 $servername,
                 $username,
@@ -49,13 +55,29 @@
             if (!$conn) {
                 die("error" . mysqli_connect_error());
             }
+            $currentDate = date('Y-m-d');
+            if (isset($_SESSION['role'])) {
+                $id = $_SESSION['userId'];
+                if ($_SESSION['role'] == 1) {
+                    $sql = "SELECT *
+                    FROM project
+                    WHERE deadline >= CURDATE() AND deadline <= DATE_ADD(CURDATE(), INTERVAL 1 MONTH)
+                    ORDER BY deadline ASC;
+                    ";
+                } else if ($_SESSION['role'] == 3) {
+                    $sql = "SELECT project.*
+                FROM project
+                INNER JOIN project_user ON project.project_id = project_user.project_id
+                WHERE deadline >= CURDATE() AND deadline <= DATE_ADD(CURDATE(), INTERVAL 1 MONTH) 
+                AND project_user.user_id = $id
+                ORDER BY deadline ASC;";
+                }
 
-            $sql = "SELECT *
-            FROM project
-            WHERE deadline >= CURDATE() AND deadline <= DATE_ADD(CURDATE(), INTERVAL 1 YEAR)
-            ORDER BY deadline ASC;
-            ";
-            $result = mysqli_query($conn, $sql);
+                $result = mysqli_query($conn, $sql);
+            }
+
+
+
             $borderClass = 'border-primary';
 
             // Check status and update border class accordingly
@@ -68,7 +90,7 @@
                             <div class="card w-100">
                                 <div class="card-body p-4">
                                     <div class="mb-4">
-                                        <h5 class="card-title fw-semibold">Recent Timeline</h5>
+                                        <h5 class="card-title fw-semibold">Upcoming Timeline</h5>
                                     </div>
                                     <ul class="timeline-widget mb-0 position-relative">
                                         <?php
@@ -90,9 +112,6 @@
                                             }
 
                                             $formattedDate = date("d F Y", strtotime($originalDate));
-
-
-                                            // Output the formatted date
                                         ?>
                                             <li class="timeline-item d-flex position-relative overflow-hidden">
                                                 <div style="width: 150px;" class="timeline-time text-dark flex-shrink-0 text-end"><?php echo $formattedDate ?></div>
@@ -107,10 +126,6 @@
                                         <?php
                                             $num--;
                                         } ?>
-
-
-
-
                                     </ul>
                                 </div>
                             </div>
@@ -126,6 +141,39 @@
 
         </div>
     </div>
+    <?php
+    if (isset($_SESSION['username'])) {
+        if ($_SESSION['role'] == 1) {
+            $sql1 = "SELECT *
+            FROM project
+            ORDER BY deadline ASC;
+            ";
+        } else {
+            $sql1 = "SELECT project.*
+            FROM project
+            INNER JOIN project_user ON project.project_id = project_user.project_id
+            WHERE project_user.user_id = $id
+            ORDER BY deadline ASC;
+            ";
+        }
+        $result1 = mysqli_query($conn, $sql1);
+        $events = [];
+
+        while ($row1 = mysqli_fetch_assoc($result1)) {
+            $eventStart = $row1['deadline'];
+    
+            $event = [
+                'title' => $row1['project_name'],
+                'url' => '../plan/plan_detail.php?page=' . $row1['project_id'],
+                'start' => $eventStart,
+            ];
+    
+            $events[] = $event;
+        }
+    
+        $eventsJson = json_encode($events);
+    }
+    ?>
 
 
     <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
@@ -146,64 +194,10 @@
 
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 plugins: ['interaction', 'dayGrid'],
-                defaultDate: '2020-02-12',
+                defaultDate: '<?php echo $currentDate; ?>',
                 editable: true,
                 eventLimit: true, // allow "more" link when too many events
-                events: [{
-                        title: 'All Day Event',
-                        start: '2020-02-01'
-                    },
-                    {
-                        title: 'Long Event',
-                        start: '2020-02-07',
-                        end: '2020-02-10'
-                    },
-                    {
-                        groupId: 999,
-                        title: 'Repeating Event',
-                        start: '2020-02-09T16:00:00'
-                    },
-                    {
-                        groupId: 999,
-                        title: 'Repeating Event',
-                        start: '2020-02-16T16:00:00'
-                    },
-                    {
-                        title: 'Conference',
-                        start: '2020-02-11',
-                        end: '2020-02-13'
-                    },
-                    {
-                        title: 'Meeting',
-                        start: '2020-02-12T10:30:00',
-                        end: '2020-02-12T12:30:00'
-                    },
-                    {
-                        title: 'Lunch',
-                        start: '2020-02-12T12:00:00'
-                    },
-                    {
-                        title: 'Meeting',
-                        start: '2020-02-12T14:30:00'
-                    },
-                    {
-                        title: 'Happy Hour',
-                        start: '2020-02-12T17:30:00'
-                    },
-                    {
-                        title: 'Dinner',
-                        start: '2020-02-12T20:00:00'
-                    },
-                    {
-                        title: 'Birthday Party',
-                        start: '2020-02-13T07:00:00'
-                    },
-                    {
-                        title: 'Click for Google',
-                        url: 'http://google.com/',
-                        start: '2020-02-28'
-                    }
-                ]
+                events: <?php echo $eventsJson; ?>,
             });
 
             calendar.render();
