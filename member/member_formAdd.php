@@ -146,9 +146,8 @@ include "../auth/checklogin.php";
 
                                     <select required name="role" onchange="showRole(this.value)" class="form-control select2" style="width: 100%; padding: 8px 15px; font-size: 18px; margin-top: 5px; height: 45px;">
                                         <option value="" disabled selected>Select your role</option>
-                                        <?php foreach ($result as $item) { ?>
-                                            <option class="dropdown-item text-capitalize" href="#"> <?php echo $item['name']; ?></option>
-                                        <?php } ?>
+                                            <option class="dropdown-item text-capitalize" href="#">Admin</option>
+                                            <option class="dropdown-item text-capitalize" href="#">User</option>
                                     </select>
                                 </div>
 

@@ -160,7 +160,6 @@ include "../auth/checklogin.php";
                                 </p>
                             </div>
                             <input class="opacity-0" type="file" id="imageInput" name="myfile">
-
                         </label>
                     </div>
                     <div class="row justify-content-between text-left p-4">
@@ -169,9 +168,8 @@ include "../auth/checklogin.php";
                             <label class="form-control-label px-3 pb-1">Role<span class="text-danger"> *</span></label>
 
                             <select required name="role" onchange="showRole(this.value)" class="form-control select2" style="width: 100%; padding: 8px 15px; font-size: 18px; margin-top: 5px; height: 45px;">
-                                <?php foreach ($roleResult as $item) { ?>
-                                    <option value="<?php echo $item['name']; ?>" <?php echo ($membersRow['name'] == $item['name']) ? 'selected' : ''; ?>><?php echo $item['name']; ?></option>
-                                <?php } ?>
+                                    <option value="Admin" <?php echo ($membersRow['name'] == 'admin') ? 'selected' : ''; ?> >Admin</option>
+                                    <option value="User" <?php echo ($membersRow['name'] == 'user') ? 'selected' : ''; ?> >User</option>
                             </select>
                         </div>
                     </div>

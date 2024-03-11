@@ -129,10 +129,10 @@ $userId = $_SESSION['userId']
 
                     $pdfContent = file_get_contents($newPdfFile);
                     $pdfContent = mysqli_real_escape_string($conn, $pdfContent);
-                    $sqlUpdateProject = "UPDATE project SET project_name = '$plan', level = '$level', deadline = '$date', description = '$description',status = '$status' , pdf_data = '$pdfContent' WHERE project_id = '$id'";
+                    $sqlUpdateProject = "UPDATE project SET project_name = '$plan', level = '$level', deadline = '$date', description = '$description', pdf_data = '$pdfContent' WHERE project_id = '$id'";
                     $resultUpdateProject = mysqli_query($conn, $sqlUpdateProject);
                 } else {
-                    $sqlUpdateProject = "UPDATE project SET project_name = '$plan', level = '$level', deadline = '$date', description = '$description',status = '$status'  WHERE project_id = '$id'";
+                    $sqlUpdateProject = "UPDATE project SET project_name = '$plan', level = '$level', deadline = '$date', description = '$description'  WHERE project_id = '$id'";
                     $resultUpdateProject = mysqli_query($conn, $sqlUpdateProject);
                 }
 
@@ -281,7 +281,7 @@ $userId = $_SESSION['userId']
                                     <input value="<?php echo number_format($projectBudget); ?> " disabled type="text">
                                 </div>
                                 <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">งบประมาณที่ใช้ไป <span class="text-danger">*</span></label>
-                                    <input value="<?php echo number_format($projectBudgetUserUsed); ?>" name="budgetUsed" type="number">
+                                    <input value="<?php echo $projectBudgetUserUsed; ?>" name="budgetUsed" type="number">
                                 </div>
                             </div>
 
@@ -309,18 +309,7 @@ $userId = $_SESSION['userId']
 
                             <div class="row justify-content-between text-left p-4">
                                
-                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">Status<span class="text-danger"> *</span></label>
-                                    <select required name="status" class="form-control select2" style="width: 100%; padding: 8px 15px; font-size: 18px;  margin-top: 5px; height: 50px;">
-                                        <option value="" disabled selected>Select Status</option>
-                                        <?php
-                                        $statusMapping = ['Success' => 1, 'In Progess' => 2, 'Failed' => 3];
-                                        foreach ($statusMapping as $statusName => $numericValue) {
-                                            $selected = ($numericValue == $projectStatus) ? 'selected' : '';
-                                        ?>
-                                            <option class="dropdown-item text-capitalize" value="<?php echo $numericValue; ?>" <?php echo $selected; ?>> <?php echo $statusName; ?></option>
-                                        <?php } ?>
-                                    </select>
-                                </div>
+                               
                                 <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ข้อมูลเพิ่มเติม<span class="text-danger"> *</span></label>
                                     <textarea name="description" id="" cols="30" rows="4"><?php echo  $projectDescription ?> </textarea>
                                 </div>

@@ -517,7 +517,7 @@ $userId = $_SESSION['userId']
                                     $userFileCon++;
                                 }
                             }
-                            $Process = ($userCount > 0) ? ($userFileCon / $userCount * 100) : 0;
+                            $Process = ($userCount > 0) ? intval($userFileCon / $userCount * 100) : 0;
                             mysqli_data_seek($userResult, 0);
                     ?>
                             <div class="projectCard projectCard2">

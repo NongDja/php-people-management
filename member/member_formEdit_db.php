@@ -27,12 +27,17 @@ if (!$conn) {
     die("error" . mysqli_connect_error());
 }
 
-
-$sql1 = "UPDATE members SET firstname = '$fname', surname = '$lname', email = '$email', phone = '$mob', image_data = '$image_data', branch_id = $branch WHERE id = $userId";
+if ($image_name <> "") {
+    $sql1 = "UPDATE members SET firstname = '$fname', surname = '$lname', email = '$email', phone = '$mob', image_data = '$image_data', branch_id = $branch WHERE id = $userId";
 $result1 = mysqli_query($conn, $sql1);
+} else {
+    $sql1 = "UPDATE members SET firstname = '$fname', surname = '$lname', email = '$email', phone = '$mob', branch_id = $branch WHERE id = $userId";
+    $result1 = mysqli_query($conn, $sql1);
+}
+
 
 $role_id = match ($role) {
-    'admin' => 1,
+    'Admin' => 1,
     'moderator' => 2,
     default => $defaultRoleId,
 };

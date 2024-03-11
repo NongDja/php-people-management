@@ -195,7 +195,7 @@
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 plugins: ['interaction', 'dayGrid'],
                 defaultDate: '<?php echo $currentDate; ?>',
-                editable: true,
+                // editable: true,
                 eventLimit: true, // allow "more" link when too many events
                 events: <?php echo $eventsJson; ?>,
             });
