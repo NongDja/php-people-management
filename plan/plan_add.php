@@ -130,7 +130,7 @@ include "../auth/checklogin.php";
                     $pdfContent = mysqli_real_escape_string($conn, $pdfContent);
                     $budget = mysqli_real_escape_string($conn, $budget);
                     // Your SQL query
-                    $sql = "INSERT INTO project (project_name, level, deadline, description, pdf_data, budget) VALUES ('$plan', '$level', '$date', '$description', '$pdfContent',$budget)";
+                    $sql = "INSERT INTO project (project_name, level, deadline, description, pdf_data, budget,admin_create) VALUES ('$plan', '$level', '$date', '$description', '$pdfContent',$budget,1)";
 
                     $result = mysqli_query($conn, $sql);
                     if ($result) {

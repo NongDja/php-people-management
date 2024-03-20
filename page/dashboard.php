@@ -164,6 +164,7 @@ include "../auth/checklogin.php";
                                             // Store the data for further processing if needed
                                             $yearlyData[] = $yearBudget;
                                         }
+                                        $totalBudgetLastYear == 0 ? $percentage = 0 :
                                         $percentage = ($totalBudgetCurrentYear /  $totalBudgetLastYear) * 100;
 
                                         $allBudget = array_map('intval', $allBudget);
@@ -287,10 +288,25 @@ include "../auth/checklogin.php";
                                     <div class="card" style="height: 218px;">
                                         <div class="card-body">
                                             <div class="row alig n-items-start">
-
+                                                <?php
+                                                 $conn = mysqli_connect(
+                                                    $servername,
+                                                    $username,
+                                                    $password,
+                                                    $dbname
+                                                );
+                        
+                                                if (!$conn) {
+                                                    die("Connection failed: " . mysqli_connect_error());
+                                                }
+                                                $sql4 = "SELECT COUNT(*) as countMonth FROM project WHERE YEAR(deadline) = $currentYear AND MONTH(deadline) = $currentMonth";
+                                                $resultCountMonth = mysqli_query($conn, $sql4);
+                                                $countMonth = mysqli_fetch_assoc($resultCountMonth);
+                                                mysqli_close($conn);
+                                                ?>
                                                 <div class="col-8">
                                                     <h5 class="card-title mb-9 fw-semibold">จำนวนการอบรมเดือนนี้</h5>
-                                                    <h4 class="fw-semibold mb-3">12 ครั้ง</h4>
+                                                    <h4 class="fw-semibold mb-3"><?php echo $countMonth['countMonth'] ?> ครั้ง</h4>
                                                     <div class="d-flex align-items-center pb-1">
 
 
@@ -371,6 +387,12 @@ include "../auth/checklogin.php";
                                     </div>
                                     <div class="col-12" id="additionalFields" style="display: none;">
                                         <form action="get_process.php" id="trainingForm" method="post">
+                                            <div class="row ">
+                                                <div class="col-6">
+                                                <label for="name">ชื่ออบรม:</label>
+                                                <input name="projectName" class="form-control" type="text">
+                                                </div>
+                                            </div>
                                             <div class="row">
                                                 <div class="col-6">
                                                     <label for="branch">สาขา:</label>

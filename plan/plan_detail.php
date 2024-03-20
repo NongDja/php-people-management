@@ -159,13 +159,10 @@ include "../auth/checklogin.php";
                             <h2 style="display: inline;  margin-left:15px;  <?php echo $projectStatus == 1 ? 'color: #69bc72;' : ($projectStatus == 2 ? 'color: #e1701a;' : 'color: #ec0b0b;') ?>"><?php echo $projectStatus = $projectStatus == 1 ? 'Success' : ($projectStatus == 2 ? 'In Progress' : 'Failed'); ?></h2>
                         </div>
                         <div class="content">
-                            <label class="form-label" for="projectName" style="display: inline;">ระยะเวลาเริ่มในการดำเนินงาน: </label>
+                            <label class="form-label" for="projectName" style="display: inline;">วันที่ไปอบรม: </label>
                             <h2 style="display: inline;  margin-left:15px;">วันที่ <?php echo $formattedDate; ?></h2>
                         </div>
-                        <div class="content">
-                            <label class="form-label" for="projectName" style="display: inline;">ระยะเวลาสิ้นสุดการดําเนินงาน: </label>
-                            <h2 style="display: inline;  margin-left:15px;  ">วันที่ <?php echo $formattedDate; ?></h2>
-                        </div>
+
                         <div class="content">
                             <label class="form-label" for="projectName" style="display: inline;">งบประมาณ: </label>
                             <h2 style="display: inline; margin-left:15px;">
@@ -204,9 +201,13 @@ include "../auth/checklogin.php";
                                 <div class="modal-dialog">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h2 class="modal-title" id="exampleModalLabel">รายชื่อสมาชิกที่ไปอบรม</h2>
-
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            <div class="col-12">
+                                            <h3><?php echo $projectName; ?></h3>
+                                            <h2  id="exampleModalLabel">รายชื่อสมาชิกที่ไปอบรม</h2>
+                                            </div>
+                                            
+                                            
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="position: absolute; top: 20px; right: 20px;"></button>
                                         </div>
                                         <div class="modal-body" style="padding: 0px;">
                                             <?php
@@ -220,6 +221,7 @@ include "../auth/checklogin.php";
                                                 branch.branch_name,
                                                 branch.branch_id,
                                                 project_user.train,
+                                                project_user.date_to_go,
                                                 project_user.file_name,
                                                 project_user.file_content,
                                                 (
@@ -251,9 +253,16 @@ include "../auth/checklogin.php";
                                                         $memberSurname = $row['surname'];
                                                         $memberCount = $row['memberCount'];
                                                         $memberTrain = $row['train'];
+                                                        $memberDateToGo = $row['date_to_go'];
                                                         $memberFileName = $row['file_name'];
                                                         $memberFileContent = $row['file_content'];
-
+                                                        
+                                                        if (isset($memberDateToGo)) {
+                                                            $memberDateToGo = strtotime($memberDateToGo);
+                                                            $formattedMemberDate = date("d $thaiMonth Y", $memberDateToGo);
+                                                        } else {
+                                                            $formattedMemberDate = '';
+                                                        }
                                                         if (!isset($branchData[$branchId])) {
                                                             $branchData[$branchId] = array(
                                                                 'branch_name' => $branchName,
@@ -266,19 +275,23 @@ include "../auth/checklogin.php";
                                                             'firstname' => $memberFirstname,
                                                             'surname' => $memberSurname,
                                                             'train' => $memberTrain,
+                                                            'dateTogo' => $formattedMemberDate,
                                                             'file_content' => $memberFileContent,
                                                             'file_name' => $memberFileName
                                                         );
                                             ?>
 
                                             <?php  }
+                                           
+                                                   
                                                     foreach ($branchData as $branchId => $branch) {
+
                                                         echo '<div class="p-4">';
                                                         echo '<h3>' . $branch['branch_name'] . '</h3>';
                                                         foreach ($branch['members'] as $member) {
                                                             echo '<div class="member-info">';
                                                             $colorClass = ($member['train'] == 0 ? 'not-going' : 'going');
-                                                            echo '<span class="' . $colorClass . '">' . $member['firstname'] . ' ' . $member['surname'] . ' ' . ($member['train'] == 0 ? '(ไม่ไป)' : '(ไป)') . '</span>';
+                                                            echo '<span class="' . $colorClass . '">' . $member['firstname'] . ' ' . $member['surname'] . ' ' . ($member['train'] == 0 ? '(ไม่ไป )' : '(ไป ' . (isset($member['dateTogo']) ? $member['dateTogo'] : '') . ')') . '</span>';
 
                                                             if ($member['file_content'] !== null) {
                                                                 echo '<a href="download.php?id=' . $member['member_id'] . '&project_id=' . $projectId  . '">Download File</a>';
@@ -304,7 +317,7 @@ include "../auth/checklogin.php";
                                 <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" style="margin-top: 3px;" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
                                     <path d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z" />
                                 </svg>
-                                <h2 style="margin-left: 5px;"> <?php echo  $memberCount; ?>/88</h2>
+                                <h2 style="margin-left: 5px;"> <?php echo  $memberCount; ?> ท่าน</h2>
                             </div>
                         </div>
 

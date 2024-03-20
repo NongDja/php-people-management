@@ -110,9 +110,9 @@ $userId = $_SESSION['userId']
             $level = $_POST['level'];
             $date = $_POST['date'];
             $description = $_POST['description'];
-            $status = $_POST['status'];
 
             $train = $_POST['train'];
+            $dateToGo = $_POST['dateToGo'];
 
             $budgetUserUsed = $_POST['budgetUsed'];
 
@@ -146,11 +146,11 @@ $userId = $_SESSION['userId']
                     $file_content = file_get_contents($file_tmp);
                     $file_content = mysqli_real_escape_string($conn, $file_content);
                     $file_name = mysqli_real_escape_string($conn, $file_name);
-                    $sqlProjectUser = "UPDATE project_user SET train = $train, budget_user_used = $budgetUserUsed, file_name =  '$file_name' , file_content = '$file_content' WHERE project_id = '$id' AND user_id = $userId";
+                    $sqlProjectUser = "UPDATE project_user SET train = $train, date_to_go = '$dateToGo', budget_user_used = $budgetUserUsed, file_name =  '$file_name' , file_content = '$file_content' WHERE project_id = '$id' AND user_id = $userId";
                     $resultProjectUser = mysqli_query($conn, $sqlProjectUser);
                 }
                 else {
-                    $sqlProjectUser = "UPDATE project_user SET train = $train, budget_user_used = $budgetUserUsed WHERE project_id = '$id' AND user_id = $userId";
+                    $sqlProjectUser = "UPDATE project_user SET train = $train, date_to_go = '$dateToGo', budget_user_used = $budgetUserUsed WHERE project_id = '$id' AND user_id = $userId";
                     $resultProjectUser = mysqli_query($conn, $sqlProjectUser);
                 }
                 // Insert into project_user table for each selected user
@@ -217,6 +217,7 @@ $userId = $_SESSION['userId']
                             $projectDeadline = $project['deadline'];
                             $projectDescription = $project['description'];
                             $projectTrain = $project['train'];
+                            $projectTogo = $project['date_to_go'];
                             $projectBudget = $project['budget'];
                             $projectBudgetUserUsed = $project['budget_user_used'];
                             $projectPdf = $project['pdf_data'];
@@ -267,7 +268,7 @@ $userId = $_SESSION['userId']
 
                             </div>
                             <div class="row justify-content-between text-left p-4">
-                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">Date<span class="text-danger"> *</span></label>
+                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">วันที่จัดอบรม<span class="text-danger"> *</span></label>
                                     <input type="datetime-local" name="date" placeholder="Select Date">
                                 </div>
 
@@ -301,14 +302,18 @@ $userId = $_SESSION['userId']
                                         <?php } ?>
                                     </select>
                                 </div>
-
-                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ใบรับรองการอบรม<span class="text-danger"> *</span></label>
-                                    <input type="file" name="userFile" accept=".pdf, .rar, .zip" />
+                                        
+                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">วันที่ไป<span class="text-danger"> *</span></label>
+                                    <input type="datetime-local-togo" name="dateToGo" placeholder="Select Date">
                                 </div>
+
+                                
                             </div>
 
                             <div class="row justify-content-between text-left p-4">
-                               
+                            <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ใบรับรองการอบรม<span class="text-danger"> *</span></label>
+                                    <input type="file" name="userFile" accept=".pdf, .rar, .zip" />
+                                </div>
                                
                                 <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ข้อมูลเพิ่มเติม<span class="text-danger"> *</span></label>
                                     <textarea name="description" id="" cols="30" rows="4"><?php echo  $projectDescription ?> </textarea>
@@ -343,6 +348,16 @@ $userId = $_SESSION['userId']
             defaultDate: '<?php echo $projectDeadline; ?>',
         })
     </script>
+
+<script>
+    flatpickr("input[type=datetime-local-togo]", {
+        minDate: "today",
+        <?php
+       
+            echo "defaultDate: '" . $projectTogo . "',";
+        ?>
+    });
+</script>
 </body>
 
 </html>

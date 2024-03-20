@@ -153,12 +153,12 @@ include "../auth/checklogin.php";
 
                             </div>
                             <div class="row justify-content-between text-left p-4">
-                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">First name<span class="text-danger"> *</span></label> <input type="text" required id="fname" name="fname" placeholder="Enter your first name"> </div>
-                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">Last name<span class="text-danger"> *</span></label> <input type="text" required id="lname" name="lname" placeholder="Enter your last name"> </div>
+                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ชื่อจริง<span class="text-danger"> *</span></label> <input type="text" required id="fname" name="fname" placeholder="Enter your first name"> </div>
+                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">นามสกุล<span class="text-danger"> *</span></label> <input type="text" required id="lname" name="lname" placeholder="Enter your last name"> </div>
                             </div>
                             <div class="row justify-content-between text-left p-4">
-                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">Email<span class="text-danger"> *</span></label> <input required type="text" id="email" name="email" placeholder="Enter your email"> </div>
-                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">Phone number<span class="text-danger"> *</span></label> <input required type="text" id="mob" name="mob" placeholder="Enter your phone number"> </div>
+                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">อีเมล<span class="text-danger"> *</span></label> <input required type="text" id="email" name="email" placeholder="Enter your email"> </div>
+                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">เบอร์โทรติดต่อ<span class="text-danger"> *</span></label> <input maxlength="10" required type="text" id="mob" name="mob" placeholder="Enter your phone number"> </div>
                             </div>
                             <div class="row justify-content-between text-left p-4">
                                 <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">Password<span class="text-danger"> *</span></label>

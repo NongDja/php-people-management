@@ -11,7 +11,7 @@ echo '<script>
 setTimeout(function() {
     swal({
         title: "Logout",
-        text: "Logout Successful",
+        text: "ออกจากระบบสำเร็จ",
         type: "success"
     }, function() {
         window.location = "../index.php"; //หน้าที่ต้องการให้กระโดดไป

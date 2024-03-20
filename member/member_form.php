@@ -87,7 +87,7 @@ else
                             <div class="col-3 d-flex align-items-center"><?= $k['branch_name']; ?></div>
                             <div class="col-3 d-flex align-items-center gap-3 <?php  echo ($_SESSION['role'] == 3) ? 'justify-content-center' : ''; ?>">
                                 <a href="member_detail.php?page=<?php echo $k['id']; ?>" type="button" class="btn btn-info"><i class="fa fa-info-circle me-1"></i>Detail</a>
-                                <?php if ($_SESSION['role'] != 3) { ?> <a href="member_formEdit.php?page=<?php echo $k['id']; ?>" type="button" class="btn btn-warning"><i class="fa fa-edit me-1"></i> Edit</a>  <?php } ?> 
+                                <?php if ($_SESSION['role'] != 3 || $_SESSION['userId'] == $k['id']) { ?> <a href="member_formEdit.php?page=<?php echo $k['id']; ?>" type="button" class="btn btn-warning"><i class="fa fa-edit me-1"></i> Edit</a>  <?php } ?> 
                                 <?php if ($_SESSION['role'] != 3) { ?> <a href="#" class="btn btn-danger" onclick="confirmDelete(<?php echo $k['id']; ?>)">
                                     <i class="fa fa-trash me-1"></i>Delete
                                 </a> <?php } ?> 

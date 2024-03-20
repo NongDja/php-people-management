@@ -47,8 +47,8 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
             echo '<script>
             setTimeout(function() {
                 swal({
-                    title: "เข้าได้แล้วจ้า",
-                    text: "Login success",
+                    title: "Login",
+                    text: "เข้าสู่ระบบสำเร็จ",
                     type: "success",
                 }, function() {
                     window.location = "../page/home.php"; //หน้าที่ต้องการให้กระโดดไป

@@ -189,7 +189,7 @@ $userId = $_SESSION['userId']
             width: 100%;
             height: 100%;
             display: flex;
-            justify-content: flex-start;
+            justify-content: space-between;
             align-items: center;
             cursor: pointer;
         }
@@ -341,6 +341,7 @@ $userId = $_SESSION['userId']
             include '../connect.php';
             $search = isset($_GET['search']) ? $_GET['search'] : '';
             $branchFilter = isset($_GET['branch_filter']) ? $_GET['branch_filter'] : '';
+            $adminFilter = isset($GET['admin_filter']) ? $_GET['admin_filter'] : '';
             $con = mysqli_connect($servername, $username, $password, $dbname);
             $queryBranch = "SELECT * FROM branch";
             $stbh = mysqli_prepare($con, $queryBranch);
@@ -363,38 +364,41 @@ $userId = $_SESSION['userId']
                                                                                 } else {
                                                                                     echo '../plan/self_add.php';
                                                                                 } ?>" class="btn btn-info">+เพิ่มข้อมูล</a></h3>
-                          </div>
+                            </div>
                             <div class="col-4 d-flex justify-content-end">
                                 <?php
-                               echo "<form class='input-group' method='get' action=''>";
-                               echo "<input style='background: #fff;' class='form-control' type='text' name='search' placeholder='Search by name' value='$search' />";
-                               echo "<input type='hidden' name='branch_filter' value='$branchFilter' />";
-                               echo "<div class='input-group-append'>";
-                               echo "<button class='btn btn-secondary' style='margin-top:2px; margin-left:2px;' type='submit'>";
-                               echo '<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                echo "<form class='input-group' method='get' action=''>";
+                                echo "<input style='background: #fff;' class='form-control' type='text' name='search' placeholder='ค้นหา' value='$search' />";
+                                echo "<input type='hidden' name='branch_filter' value='$branchFilter' />";
+                                echo "<div class='input-group-append'>";
+                                echo "<button class='btn btn-secondary' style='margin-top:2px; margin-left:2px;' type='submit'>";
+                                echo '<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                      <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
                                      <path d="M21 21l-6 -6" />
                                    </svg>';
-                               echo "</button>";
-                               echo "</div>";
-                               echo "</form>";
+                                echo "</button>";
+                                echo "</div>";
+                                echo "</form>";
                                 ?>
                             </div>
                             <div class="col-2 d-flex justify-content-end">
+                               
                                 <div class="dropdown">
                                     <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
                                         สาขา
                                     </button>
+
+
                                     <div class="dropdown">
                                         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                                             <?php
-                                              echo "<li><a class='dropdown-item' href='?page=1&search={$search}&branch_filter='''  </a>All</li>";
+                                            echo "<li><a class='dropdown-item' href='?page=1&search={$search}&branch_filter='''  </a>All</li>";
                                             while ($row = mysqli_fetch_assoc($resultBranch)) {
                                                 $selected = ($row['branch_id'] == $branchFilter) ? 'selected' : '';
                                                 echo "<li><a class='dropdown-item' href='?page=1&search={$search}&branch_filter={$row['branch_id']}' {$selected}>{$row['branch_name']}</a></li>";
                                             }
-                                          
+
                                             ?>
                                         </ul>
                                     </div>
@@ -426,7 +430,7 @@ $userId = $_SESSION['userId']
                             OR project.project_name LIKE '%$search%'  
                             OR members.firstname LIKE '%$search%' 
                             OR members.surname LIKE '%$search%'
-                        ) AND ('$branchFilter' = '' OR members.branch_id = '$branchFilter')
+                        ) AND ('$branchFilter' = '' OR members.branch_id = '$branchFilter') 
                         ORDER BY project.project_id DESC
                         LIMIT $startFrom, $recordsPerPage;";
                     } else {
@@ -490,9 +494,10 @@ $userId = $_SESSION['userId']
                             $projectName = $project['project_name'];
                             $projectDescription = $project['description'];
                             $projectDate = $project['deadline'];
+                            $projectAdmin = $project['admin_create'];
                             $projectOrganizeName = $project['or_name'];
 
-                            $userQuery = "SELECT project_user.user_id,members.image_data, project_user.file_name
+                            $userQuery = "SELECT project_user.user_id,members.image_data, project_user.file_name,project_user.train
                             FROM members 
                             JOIN project_user ON members.id = project_user.user_id
                             WHERE project_user.project_id = ?
@@ -505,11 +510,16 @@ $userId = $_SESSION['userId']
                             $userResult = mysqli_stmt_get_result($userStmt);
                             $dateTime = new DateTime($projectDate);
                             $formattedDate = $dateTime->format('d F Y');
+                            $userTrain = 0;
                             $userFileCon = 0;
                             $userCount = 0;
                             while ($Count = mysqli_fetch_assoc($userResult)) {
+                                $userGoTrain = $Count['train'];
                                 $userAwaitCount = $Count['user_id'];
                                 $file_name = $Count['file_name'];
+                                if ($userGoTrain) {
+                                    $userTrain++;
+                                }
                                 if ($userAwaitCount) {
                                     $userCount++;
                                 }
@@ -517,7 +527,7 @@ $userId = $_SESSION['userId']
                                     $userFileCon++;
                                 }
                             }
-                            $Process = ($userCount > 0) ? intval($userFileCon / $userCount * 100) : 0;
+                            $Process = ($userCount > 0) ? intval($userFileCon / $userCount * 50) +  intval($userTrain  / $userCount * 50)   : 0;
                             mysqli_data_seek($userResult, 0);
                     ?>
                             <div class="projectCard projectCard2">
@@ -545,7 +555,7 @@ $userId = $_SESSION['userId']
                                         <h2 style="<?php echo $projectStatus === 1 ? 'color: #69bc72;' : ($projectStatus === 2 ? 'color: #e1701a;' : 'color: #ec0b0b;') ?>"><?php echo $projectStatus = $projectStatus === 1 ? 'Success' : ($projectStatus === 2 ? 'In Progress' : 'Failed'); ?></h2>
                                     </div>
                                     <div class="priority">
-                                        <h2 style="<?php echo $projectLevel === 1 ? 'color: #69bc72;' : ($projectStatus === 2 ? 'color: #e1701a;' : 'color: #ec0b0b;') ?>"><?php echo  $projectOrganizeName; ?></h2>
+                                        <h2 style="<?php echo $projectLevel == 1 ? 'color: #69bc72;' : ($projectLevel == 2 ? 'color: #e1701a;' : 'color: #ec0b0b;') ?>"><?php echo  $projectOrganizeName; ?></h2>
                                     </div>
                                 </div>
                                 <div class="task">
@@ -558,6 +568,17 @@ $userId = $_SESSION['userId']
                                 <!-- <div class="divider"></div> -->
                                 <div class="due">
                                     <h2>Date: <?php echo $formattedDate; ?></h2>
+                                    <div>
+                                        <h4>
+                                            <?php
+                                            if ($projectAdmin) {
+                                                echo '<i class="ti ti-users"></i>';
+                                            } else {
+                                                echo '<i class="ti ti-user"></i>';
+                                            }
+                                            ?>
+                                        </h4>
+                                    </div>
                                 </div>
 
                                 <div class='groupImg'>
@@ -585,8 +606,8 @@ $userId = $_SESSION['userId']
                                         if ($pic >= 5) {
                                             break;
                                         }
-                                        }
-                            
+                                    }
+
                                     if ($totalRows > 5) {
                                     ?>
                                         <a style="--left: -60px;     border: 3px solid #999;
@@ -618,9 +639,7 @@ $userId = $_SESSION['userId']
                                 </li>
                             </ul>
                         </nav>
-                    <?php } else {
-                        echo "No results found.";
-                    }
+                    <?php } 
                     ?>
                 </div>
 

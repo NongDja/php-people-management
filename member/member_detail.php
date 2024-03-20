@@ -393,7 +393,7 @@ include "../auth/checklogin.php";
                                         </div>
                                     </div>
                                 </div>
-                                <?php if ($_SESSION["role"] == 1)  { ?> 
+                                <?php if ($_SESSION["role"] == 1 || $_SESSION["userId"] == $row["id"])  { ?> 
                                     <div class="col-2" style="  position: absolute; top:20px; right:20px">
                                     <a href="../member/member_formEdit.php?page=<?= $_GET['page'] ?>" type="submit" class="profile-edit-btn btn btn-light" style="border-radius: 50px; font-size: 14px; color: gray; font-weight: 500;">Edit Profile</a>
                                 </div>

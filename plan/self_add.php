@@ -131,7 +131,7 @@ $userId = $_SESSION["userId"];
                     $pdfContent = mysqli_real_escape_string($conn, $pdfContent);
                     $budget = mysqli_real_escape_string($conn, $budget);
                     // Your SQL query
-                    $sql = "INSERT INTO project (project_name, level, deadline, description, pdf_data, budget) VALUES ('$plan', '$level', '$date', '$description', '$pdfContent',$budget)";
+                    $sql = "INSERT INTO project (project_name, level, deadline, description, pdf_data, budget, admin_create) VALUES ('$plan', '$level', '$date', '$description', '$pdfContent',$budget,0)";
 
                     $result = mysqli_query($conn, $sql);
                     if ($result) {
@@ -139,7 +139,7 @@ $userId = $_SESSION["userId"];
 
                         // Insert into project_user table for each selected user
 
-                        $sqlProjectUser = "INSERT INTO project_user (project_id, user_id,train,budget_user_used) VALUES ('$lastProjectId', '$userId',0, 0)";
+                        $sqlProjectUser = "INSERT INTO project_user (project_id, user_id,train,budget_user_used) VALUES ('$lastProjectId', '$userId',1, 0)";
                         $resultProjectUser = mysqli_query($conn, $sqlProjectUser);
 
                         if (!$resultProjectUser) {

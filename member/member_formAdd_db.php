@@ -5,6 +5,11 @@ echo '
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.css">';
 
 include "../connect.php";
+if(isset($_POST['user']) && isset($_POST['fname']) && isset($_POST['lname']) 
+&& isset($_POST['email']) && isset($_POST['mob']) && isset($_POST['role']) 
+&& isset($_POST['branch']) && isset($_POST['password']) && isset($_POST['repassword'])) {
+
+    
 $user = $_POST["user"];
 $fname = $_POST["fname"];
 $lname = $_POST["lname"];
@@ -106,3 +111,5 @@ if ($pwd == $repwd) {
 
 mysqli_free_result($checkUsernameResult);
 mysqli_close($conn);
+}
+

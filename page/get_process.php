@@ -12,41 +12,56 @@ if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
 // Retrieve and sanitize form data
+$projectName = mysqli_real_escape_string($conn, $_POST['projectName']);
 $branch = mysqli_real_escape_string($conn, $_POST['branch']);
 $member = mysqli_real_escape_string($conn, $_POST['member']);
 $yearStart = mysqli_real_escape_string($conn, $_POST['yearStart']);
 $yearEnd = mysqli_real_escape_string($conn, $_POST['yearEnd']);
 $budgetStart = mysqli_real_escape_string($conn, $_POST['budgetStart']);
 $budgetEnd = mysqli_real_escape_string($conn, $_POST['budgetEnd']);
+$where = "";
+$conditions = array();
 
-$where = "WHERE YEAR(project.deadline) BETWEEN $yearStart AND $yearEnd
-          AND project.budget BETWEEN $budgetStart AND $budgetEnd";
-    if ($_POST['branch'] != 'all') {
-        $where .= " AND members.branch_id = $branch";
+if(!empty($projectName)) {
+    $conditions[] = "project.project_name LIKE '%$projectName%'";
+}
 
-    if ($_POST['member'] != 'all') {
-        $where .= " AND members.id = $member";
-    }   
-}   
+if (!empty($yearStart) && !empty($yearEnd)) {
+    $conditions[] = "YEAR(project.deadline) BETWEEN $yearStart AND $yearEnd";
+}
 
-// Perform your database query based on the form data
-$sql = "SELECT  project_user.project_id,
-project.project_name,
-members.firstname,
-members.surname,
-project_user.train,
-project_user.budget_user_used,
-project.status,
-project.level,
-project.deadline,
-project.description,
-project.budget
-FROM project_user 
-INNER JOIN project on project.project_id = project_user.project_id 
-INNER JOIN members on members.id = project_user.user_id
-$where
-ORDER BY project_user.project_id ASC;"; // Your query conditions
+if (!empty($budgetStart) && !empty($budgetEnd)) {
+    $conditions[] = "project.budget BETWEEN $budgetStart AND $budgetEnd";
+}
 
+if ($branch != 'all') {
+    $conditions[] = "members.branch_id = $branch";
+}
+
+if ($member != 'all') {
+    $conditions[] = "members.id = $member";
+}
+
+if (!empty($conditions)) {
+    $where = "WHERE " . implode(" AND ", $conditions);
+}
+
+$sql = "SELECT project_user.project_id,
+        project.project_name,
+        members.firstname,
+        members.surname,
+        project_user.train,
+        project_user.budget_user_used,
+        project.status,
+        project.level,
+        project.deadline,
+        project.description,
+        project.budget
+        FROM project_user
+        INNER JOIN project ON project.project_id = project_user.project_id
+        INNER JOIN members ON members.id = project_user.user_id
+        $where
+        ORDER BY project_user.project_id ASC;";
 // Execute the query and fetch the result
 $result = mysqli_query($conn, $sql);
 
