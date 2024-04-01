@@ -38,7 +38,7 @@ if ($pwd == $repwd) {
     if (!$conn) {
         die("error" . mysqli_connect_error());
     }
-    $checkUsernameQuery = "SELECT username FROM user_auth WHERE username = '$user'";
+    $checkUsernameQuery = "SELECT username FROM user_auth WHERE username = '$user' OR email = '$email'";
     $checkUsernameResult = mysqli_query($conn, $checkUsernameQuery);
 
     if (mysqli_num_rows($checkUsernameResult) > 0) {
@@ -47,7 +47,7 @@ if ($pwd == $repwd) {
         setTimeout(function() {
             swal({
                 title: "เกิดข้อผิดพลาด",
-                text: "มี Username ซ้ำกัน",
+                text: "มี Username หรือ Email ซ้ำกัน",
                 type: "error"
             }, function() {
                 window.location = "member_formAdd.php"; //หน้าที่ต้องการให้กระโดดไป
@@ -58,8 +58,8 @@ if ($pwd == $repwd) {
         $sql1 = "INSERT INTO user_auth (username, password, email) VALUES ('$user', '$hashedPassword', '$email')";
         $result1 = mysqli_query($conn, $sql1);
         $userId = mysqli_insert_id($conn);
-        $sql2 = "INSERT INTO members (id, firstname, surname, email, phone, image, image_type, image_data, branch_id)
-             VALUES ('$userId', '$fname', '$lname', '$email', '$mob', '$image_name', '$image_type', '$image_data', '$branch')";
+        $sql2 = "INSERT INTO members (id, firstname, surname, phone, image, image_type, image_data, branch_id)
+             VALUES ('$userId', '$fname', '$lname',  '$mob', '$image_name', '$image_type', '$image_data', '$branch')";
         $result2 = mysqli_query($conn, $sql2);
 
         $role_id = match ($role) {

@@ -70,7 +70,9 @@ else
                 }
 
                 $start = ($page - 1) * $perpage;
-                $sql = "SELECT members.*, branch.branch_name FROM members LEFT JOIN branch ON members.branch_id = branch.branch_id WHERE members.firstname LIKE '%$search%'
+                $sql = "SELECT members.*, branch.branch_name,role_user.role_id FROM members LEFT JOIN branch ON members.branch_id = branch.branch_id
+                LEFT JOIN role_user ON role_user.user_id = members.id
+                WHERE members.firstname LIKE '%$search%'
                 OR members.id LIKE '%$search%' OR branch.branch_name LIKE '%$search%' limit {$start} , {$perpage}";
                 $stmt = mysqli_prepare($con, $sql);
                 $stmt->execute();
@@ -87,10 +89,15 @@ else
                             <div class="col-3 d-flex align-items-center"><?= $k['branch_name']; ?></div>
                             <div class="col-3 d-flex align-items-center gap-3 <?php  echo ($_SESSION['role'] == 3) ? 'justify-content-center' : ''; ?>">
                                 <a href="member_detail.php?page=<?php echo $k['id']; ?>" type="button" class="btn btn-info"><i class="fa fa-info-circle me-1"></i>Detail</a>
-                                <?php if ($_SESSION['role'] != 3 || $_SESSION['userId'] == $k['id']) { ?> <a href="member_formEdit.php?page=<?php echo $k['id']; ?>" type="button" class="btn btn-warning"><i class="fa fa-edit me-1"></i> Edit</a>  <?php } ?> 
-                                <?php if ($_SESSION['role'] != 3) { ?> <a href="#" class="btn btn-danger" onclick="confirmDelete(<?php echo $k['id']; ?>)">
-                                    <i class="fa fa-trash me-1"></i>Delete
-                                </a> <?php } ?> 
+                                <?php
+                                if($k['role_id'] == 3 || $_SESSION['userId'] == $k['id']) {
+                                    if ($_SESSION['role'] != 3 || $_SESSION['userId'] == $k['id']) { ?> <a href="member_formEdit.php?page=<?php echo $k['id']; ?>" type="button" class="btn btn-warning"><i class="fa fa-edit me-1"></i> Edit</a>  <?php } ?> 
+                                    <?php if ($_SESSION['role'] != 3) { ?> <a href="#" class="btn btn-danger" onclick="confirmDelete(<?php echo $k['id']; ?>)">
+                                        <i class="fa fa-trash me-1"></i>Delete
+                                    </a> <?php }
+                                }
+                                ?>
+                             
                             </div>
                         </div>
                     </div>

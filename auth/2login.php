@@ -8,25 +8,28 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
    
     include "../connect.php";
 
-    $user = $_POST['username'];
-    $enteredPassword = $_POST['password']; 
+    $user = $_POST['username']; 
+    $enteredPassword = $_POST['password'];
+    
     $con = mysqli_connect($servername, $username, $password, $dbname);
-
     if (mysqli_connect_errno()) {
-        echo "Fail to connect to MySQL";
+        echo "Fail to connect to MySQL"; 
         exit();
     }
-
+    
     // Use prepared statement to avoid SQL injection
-    $sql = "SELECT user_auth.*, members.image_data, role_user.role_id
-    FROM user_auth 
-    JOIN members ON user_auth.userId = members.id
-    LEFT JOIN role_user ON user_auth.userId = role_user.user_id
-    WHERE user_auth.username = ?";
+    $sql = "SELECT user_auth.*, members.image_data, role_user.role_id 
+            FROM user_auth 
+            JOIN members ON user_auth.userId = members.id
+            LEFT JOIN role_user ON user_auth.userId = role_user.user_id
+            WHERE user_auth.username = ? OR user_auth.email = ?";
+    
     $stmt = mysqli_prepare($con, $sql);
-    mysqli_stmt_bind_param($stmt, "s", $user);
+    
+    // แก้ไขบรรทัดนี้
+    mysqli_stmt_bind_param($stmt, "ss", $user, $user);
+    
     mysqli_stmt_execute($stmt);
-
     $result = mysqli_stmt_get_result($stmt);
     $rowcount = mysqli_num_rows($result);
 

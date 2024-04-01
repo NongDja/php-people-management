@@ -240,7 +240,7 @@ $userId = $_SESSION['userId']
                         <form class="form-card" action="" method="post" enctype="multipart/form-data">
 
                             <div class="row justify-content-between text-left p-4">
-                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">Plan Name<span class="text-danger"> *</span></label> <input value="<?php echo $projectName; ?>" type="text" maxlength="50" required id="plan" name="plan" placeholder="Enter your plan"> </div>
+                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ชื่อการอบรม<span class="text-danger"> *</span></label> <input value="<?php echo $projectName; ?>" type="text" maxlength="50" required id="plan" name="plan" placeholder="ระบุชื่อการอบรม"> </div>
                                 <div class="col-sm-6 flex-column d-flex">
                                     <label class="form-control-label px-3 pb-1">เลือกหน่วยงาน<span class="text-danger"> *</span></label>
                                     <select required name="level" class="form-control select2" style="width: 100%; padding: 8px 15px; font-size: 18px; margin-top: 5px; height: 50px;">
@@ -269,7 +269,7 @@ $userId = $_SESSION['userId']
                             </div>
                             <div class="row justify-content-between text-left p-4">
                                 <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">วันที่จัดอบรม<span class="text-danger"> *</span></label>
-                                    <input type="datetime-local" name="date" placeholder="Select Date">
+                                    <input type="datetime-local" name="date" placeholder="เลือกวันที่">
                                 </div>
 
                                 <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">รายละเอียดการอบรม<span class="text-danger"> *</span></label>
@@ -304,7 +304,7 @@ $userId = $_SESSION['userId']
                                 </div>
                                         
                                 <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">วันที่ไป<span class="text-danger"> *</span></label>
-                                    <input type="datetime-local-togo" name="dateToGo" placeholder="Select Date">
+                                    <input type="datetime-local-togo" name="dateToGo" placeholder="เลือกวันที่">
                                 </div>
 
                                 
@@ -352,9 +352,9 @@ $userId = $_SESSION['userId']
 <script>
     flatpickr("input[type=datetime-local-togo]", {
         minDate: "today",
-        <?php
+        defaultDate: <?php
        
-            echo "defaultDate: '" . $projectTogo . "',";
+            echo "'" . $projectTogo . "',";
         ?>
     });
 </script>

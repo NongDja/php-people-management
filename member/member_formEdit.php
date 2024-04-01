@@ -114,7 +114,7 @@ include "../auth/checklogin.php";
                         $con = mysqli_connect($servername, $username, $password, $dbname);
                         if (isset($_GET['page'])) {
                             $id = mysqli_real_escape_string($con, $_GET['page']);
-                            $sql = "SELECT members.*, roles.name, user_auth.username
+                            $sql = "SELECT members.*, roles.name, user_auth.username,user_auth.email
                         FROM members
                         INNER JOIN user_auth ON members.id = user_auth.userId
                         INNER JOIN role_user ON members.id = role_user.user_id
@@ -131,7 +131,6 @@ include "../auth/checklogin.php";
                             $rolesQuery = "SELECT * FROM roles";
                             $roleResult = mysqli_query($con, $rolesQuery);
                             while ($rolesRow = mysqli_fetch_assoc($roleResult)) {
-                                // Access data from the roles table
                                 $roleId = $rolesRow['id'];
                                 $roleName = $rolesRow['name'];
                             }
@@ -181,6 +180,14 @@ include "../auth/checklogin.php";
                                 <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">นามสกุล<span class="text-danger"> *</span></label> <input value="<?php echo $membersRow["surname"] ?>" type="text" id="lname" name="lname" placeholder="Enter your last name"> </div>
                             </div>
                             <div class="row justify-content-between text-left p-4">
+                                <div class="form-group col-sm-6 flex-column d-flex">
+                                        <label for="password" class="form-control-label px-3 pb-1">รหัสผ่าน</label> <input type="password" id="password" name="password" placeholder="Password">
+                                </div>
+                                <div class="form-group col-sm-6 flex-column d-flex">
+                                        <label for="rePassword" class="form-control-label px-3 pb-1">ยืนยันรหัสผ่าน</label> <input type="password" id="repassword" name="repassword" placeholder="Re-Password">
+                                </div>
+                            </div>
+                            <div class="row justify-content-between text-left p-4">
                                 <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">อีเมล<span class="text-danger"> *</span></label> <input value="<?php echo $membersRow["email"] ?>" type="text" id="email" name="email" placeholder=""> </div>
                                 <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">เบอร์โทรติดต่อ<span class="text-danger"> *</span></label> <input value="<?php echo $membersRow["phone"] ?>" type="text" id="mob" name="mob" placeholder=""> </div>
                             </div>
@@ -204,7 +211,6 @@ include "../auth/checklogin.php";
                                             </option>
                                         <?php
                                         }
-                                        // Close the result set
 
                                         ?>
                                     </select>
@@ -235,14 +241,13 @@ include "../auth/checklogin.php";
                 reader.onload = function(e) {
                     previewImage.src = e.target.result;
                     previewImage.style.display = 'block';
-                    uploadIcon.style.display = 'none'; // Hide the SVG
+                    uploadIcon.style.display = 'none'; 
                 };
                 reader.readAsDataURL(file);
             } else {
-                // Reset to default state if no file is selected
                 previewImage.src = '#';
                 previewImage.style.display = 'none';
-                uploadIcon.style.display = 'block'; // Show the SVG
+                uploadIcon.style.display = 'block'; 
             }
         });
     </script>

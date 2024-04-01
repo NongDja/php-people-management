@@ -266,7 +266,7 @@ include "../auth/checklogin.php";
                         <form class="form-card" action="" method="post" enctype="multipart/form-data">
 
                             <div class="row justify-content-between text-left p-4">
-                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">Plan Name<span class="text-danger"> *</span></label> <input maxlength="50" value="<?php echo $projectName; ?>" type="text" required id="plan" name="plan" placeholder="Enter your plan"> </div>
+                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ชื่อการอบรม<span class="text-danger"> *</span></label> <input maxlength="50" value="<?php echo $projectName; ?>" type="text" required id="plan" name="plan" placeholder="ระบุชื่อการอบรมEnter your "> </div>
                                 <div class="col-sm-6 flex-column d-flex">
                                     <label class="form-control-label px-3 pb-1">Level<span class="text-danger"> *</span></label>
 
@@ -296,7 +296,7 @@ include "../auth/checklogin.php";
                             </div>
                             <div class="row justify-content-between text-left p-4">
                                 <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">Date<span class="text-danger"> *</span></label>
-                                    <input type="datetime-local" name="date" placeholder="Select Date">
+                                    <input type="datetime-local" name="date" placeholder="เลือกวันที่">
                                 </div>
 
                                 <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">บุคลากร<span class="text-danger"> *</span></label>
@@ -401,7 +401,6 @@ include "../auth/checklogin.php";
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
         flatpickr("input[type=datetime-local]", {
-            minDate: "today",
             defaultDate: '<?php echo $projectDeadline; ?>',
         })
     </script>

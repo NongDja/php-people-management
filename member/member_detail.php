@@ -195,6 +195,7 @@ include "../auth/checklogin.php";
                                 $id = mysqli_real_escape_string($con, $_GET['page']);
                                 $sql = "SELECT
                                 members.*,
+                                user_auth.email,
                                 branch.branch_name,
                                 COUNT(DISTINCT project_user.project_id) AS projectCount,
                                 COUNT(DISTINCT CASE WHEN project.status = 1 THEN project_user.project_id END) AS projectSuccessCount
@@ -202,6 +203,7 @@ include "../auth/checklogin.php";
                                 members
                                 INNER JOIN role_user ON members.id = role_user.user_id
                                 INNER JOIN branch ON members.branch_id = branch.branch_id
+                                LEFT JOIN user_auth ON members.id = user_auth.userId
                                 LEFT JOIN project_user ON members.id = project_user.user_id
                                 LEFT JOIN project ON project_user.project_id = project.project_id
                                 WHERE
@@ -341,7 +343,6 @@ include "../auth/checklogin.php";
                                                         while ($rowBranch = mysqli_fetch_assoc($result1)) {
                                                             if( $rowBranch['project_name'] ) {
                                                             echo '<label>' . $rowBranch['project_name'] . '</label> <br><br>';
-                                                            // You can access other fields using $rowBranch as well
                                                             }
                                                             else {
                                                                 echo '<label>ไม่มีข้อมูล</label>';
@@ -356,7 +357,6 @@ include "../auth/checklogin.php";
                                                         while ($rowBranch = mysqli_fetch_assoc($result1)) {
                                                             if( $rowBranch['deadline'] ) {
                                                                 echo '<label style=" color: #0062cc;">' . $rowBranch['deadline'] . '</label> <br><br>';
-                                                                // You can access other fields using $rowBranch as well
                                                             } else {
                                                                 echo '<label>ไม่มีข้อมูล</label>';
                                                             }
@@ -375,7 +375,6 @@ include "../auth/checklogin.php";
                                                             $statusText = ($projectStatus == 1) ? 'Success' : (($projectStatus == 2) ? 'In Progress' : 'Failed');
                                                           
                                                             echo '<label style="' . $statusColor . '">' . $statusText . '</label><br><br>';
-                                                            // You can access other fields using $rowBranch as well  
                                                             } else 
                                                             {
                                                                 echo '<label>ไม่มีข้อมูล</label>';
