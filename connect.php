@@ -2,5 +2,5 @@
  $servername = "localhost";
  $username="root";
  $password = "";
- $dbname = "project_hrms";
+ $dbname = "project";
 ?>

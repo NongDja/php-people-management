@@ -21,7 +21,7 @@ $role = $_POST["role"];
 $branch = $_POST['branch'];
 $pwd = $_POST['password'];
 $repwd = $_POST['repassword'];
-$defaultRoleId = 3;
+$defaultRoleId = 2;
 $options = [
     'cost' => 10,
 ];
@@ -42,7 +42,6 @@ if ($pwd == $repwd) {
     $checkUsernameResult = mysqli_query($conn, $checkUsernameQuery);
 
     if (mysqli_num_rows($checkUsernameResult) > 0) {
-        // Username already exists, throw an error or handle it accordingly
         echo '<script>
         setTimeout(function() {
             swal({
@@ -64,7 +63,6 @@ if ($pwd == $repwd) {
 
         $role_id = match ($role) {
             'admin' => 1,
-            'moderator' => 2,
             default => $defaultRoleId,
         };
 

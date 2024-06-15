@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <?php
-include "../auth/checklogin.php";
+include "../auth/checkadmin.php";
 ?>
 <html lang="en">
 

@@ -43,7 +43,7 @@ else
                 <div class="row">
                     <div class="col-6">
                 
-                        <h3>รายการสมาชิก <?php if ($_SESSION['role'] != 3) { ?> <a style="font-size: 14px;" href="member_formAdd.php" class="btn btn-info">+เพิ่มข้อมูล</a> <?php } ?> </h3>
+                        <h3>รายการสมาชิก <?php if ($_SESSION['role'] != 2) { ?> <a style="font-size: 14px;" href="member_formAdd.php" class="btn btn-info">+เพิ่มข้อมูล</a> <?php } ?> </h3>
                     </div>
                     <div class="col-6 d-flex justify-content-end">
                         <form action="member_form.php" method="get" class="d-flex">
@@ -87,12 +87,12 @@ else
                             </div>
                             <div class="col-4 d-flex align-items-center text-capitalize " style="font-weight: bold;"><?= $k['firstname'] . ' ' . $k['surname']; ?></div>
                             <div class="col-3 d-flex align-items-center"><?= $k['branch_name']; ?></div>
-                            <div class="col-3 d-flex align-items-center gap-3 <?php  echo ($_SESSION['role'] == 3) ? 'justify-content-center' : ''; ?>">
+                            <div class="col-3 d-flex align-items-center gap-3 <?php  echo ($_SESSION['role'] == 2) ? 'justify-content-center' : ''; ?>">
                                 <a href="member_detail.php?page=<?php echo $k['id']; ?>" type="button" class="btn btn-info"><i class="fa fa-info-circle me-1"></i>Detail</a>
                                 <?php
-                                if($k['role_id'] == 3 || $_SESSION['userId'] == $k['id']) {
-                                    if ($_SESSION['role'] != 3 || $_SESSION['userId'] == $k['id']) { ?> <a href="member_formEdit.php?page=<?php echo $k['id']; ?>" type="button" class="btn btn-warning"><i class="fa fa-edit me-1"></i> Edit</a>  <?php } ?> 
-                                    <?php if ($_SESSION['role'] != 3) { ?> <a href="#" class="btn btn-danger" onclick="confirmDelete(<?php echo $k['id']; ?>)">
+                                if($k['role_id'] == 2 || $_SESSION['userId'] == $k['id']) {
+                                    if ($_SESSION['role'] != 2 || $_SESSION['userId'] == $k['id']) { ?> <a href="member_formEdit.php?page=<?php echo $k['id']; ?>" type="button" class="btn btn-warning"><i class="fa fa-edit me-1"></i> Edit</a>  <?php } ?> 
+                                    <?php if ($_SESSION['role'] != 2) { ?> <a href="#" class="btn btn-danger" onclick="confirmDelete(<?php echo $k['id']; ?>)">
                                         <i class="fa fa-trash me-1"></i>Delete
                                     </a> <?php }
                                 }

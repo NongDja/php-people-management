@@ -170,7 +170,7 @@ include "../auth/checklogin.php";
                             </div>
                             <div class="row justify-content-between text-left p-4">
                                 <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">เลือกสาขา<span class="text-danger"> *</span></label>
-                                    <select required name="branch" class="form-control select2" style="width: 100%; padding: 8px 15px; font-size: 18px; margin-top: 5px; height: 50px;">
+                                    <select  name="branch" class="form-control select2" style="width: 100%; padding: 8px 15px; font-size: 18px; margin-top: 5px; height: 50px;">
                                         <option value="" disabled selected>เลือกสาขา</option>
                                         <?php
                                         include '../connect.php';

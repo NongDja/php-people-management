@@ -100,7 +100,6 @@ include "../auth/checklogin.php";
                 $result = mysqli_query($conn, $sql);
 
                 if ($result) {
-                    // Clear arrays before appending new data
                     $categories = array();
                     $budgets = array();
                     $butgetsUsed = array();
@@ -113,7 +112,6 @@ include "../auth/checklogin.php";
                         $butgetsUsed[] = $project['total_budget'];
                     }
 
-                    // Free result set
                     mysqli_free_result($result);
                 } else {
                     echo "Error: " . $sql . "<br>" . mysqli_error($conn);
@@ -122,7 +120,7 @@ include "../auth/checklogin.php";
             ?>
             <div class="container-fluid">
                 <?php if (isset($_SESSION['username'])) { ?>
-                    <?php if ($_SESSION['role'] != 3) { ?>
+                    <?php if ($_SESSION['role'] != 2) { ?>
                         <div class="row">
                             <div class="col-lg-4">
                                 <div class="col-lg-12">
@@ -565,7 +563,6 @@ include "../auth/checklogin.php";
                 // Prevent the default form submission
                 event.preventDefault();
 
-                // Send AJAX request to process_form.php
                 $.ajax({
                     type: 'POST',
                     url: 'get_process.php',

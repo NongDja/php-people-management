@@ -164,7 +164,7 @@ include "../auth/checklogin.php";
                             <div class="row justify-content-between text-left p-4">
                                 <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">Username<span class="text-danger"> *</span></label> <input value="<?php echo $membersRow["username"] ?>" type="text" disabled required id="user" name="user" placeholder="Enter your username"> </div>
                                 <div class="col-sm-6 flex-column d-flex">
-                                    <?php if ($_SESSION['role'] != 3) { ?>
+                                    <?php if ($_SESSION['role'] != 2) { ?>
                                         <label class="form-control-label px-3 pb-1">Role<span class="text-danger"> *</span></label>
 
                                         <select required name="role" onchange="showRole(this.value)" class="form-control select2" style="width: 100%; padding: 8px 15px; font-size: 18px; margin-top: 5px; height: 45px;">

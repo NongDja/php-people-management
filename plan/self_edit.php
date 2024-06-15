@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <?php
-include "../auth/checklogin.php";
+include "../auth/checkuser.php";
 $userId = $_SESSION['userId']
 ?>
 <html lang="en">
@@ -117,10 +117,9 @@ $userId = $_SESSION['userId']
             $budgetUserUsed = $_POST['budgetUsed'];
 
             if (isset($_FILES["newPdfFile"])) {
-                $newPdfFile = $_FILES["newPdfFile"]["tmp_name"]; // New file uploaded
+                $newPdfFile = $_FILES["newPdfFile"]["tmp_name"]; 
             }
 
-            // Start a transaction for atomicity
             mysqli_begin_transaction($conn);
 
             try {
@@ -153,7 +152,6 @@ $userId = $_SESSION['userId']
                     $sqlProjectUser = "UPDATE project_user SET train = $train, date_to_go = '$dateToGo', budget_user_used = $budgetUserUsed WHERE project_id = '$id' AND user_id = $userId";
                     $resultProjectUser = mysqli_query($conn, $sqlProjectUser);
                 }
-                // Insert into project_user table for each selected user
                
 
                 if (!$resultProjectUser) {
@@ -163,7 +161,6 @@ $userId = $_SESSION['userId']
 
                 mysqli_commit($conn);
 
-                // Optionally, provide success messages or perform additional actions here
                 echo '<script>
                 setTimeout(function() {
                     swal({
@@ -175,7 +172,7 @@ $userId = $_SESSION['userId']
                     });
                 }, 1000);
                 </script>';
-                exit(); // Exit the script if any user insertion fails
+                exit(); 
             } catch (Exception $e) {
                 mysqli_rollback($conn);
                 die('Transaction failed: ' . $e->getMessage());
@@ -219,6 +216,7 @@ $userId = $_SESSION['userId']
                             $projectTrain = $project['train'];
                             $projectTogo = $project['date_to_go'];
                             $projectBudget = $project['budget'];
+                            $projectAdminCreate = $project['admin_create'];
                             $projectBudgetUserUsed = $project['budget_user_used'];
                             $projectPdf = $project['pdf_data'];
                             if ($projectPdf !== null) {
@@ -240,10 +238,15 @@ $userId = $_SESSION['userId']
                         <form class="form-card" action="" method="post" enctype="multipart/form-data">
 
                             <div class="row justify-content-between text-left p-4">
-                                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ชื่อการอบรม<span class="text-danger"> *</span></label> <input value="<?php echo $projectName; ?>" type="text" maxlength="50" required id="plan" name="plan" placeholder="ระบุชื่อการอบรม"> </div>
+                                <div class="form-group col-sm-6 flex-column d-flex"> 
+                                    <label class="form-control-label px-3 pb-1">ชื่อการอบรม<span class="text-danger"> *</span></label> 
+                                    <input value="<?php echo $projectName; ?>" <?php echo ($projectAdminCreate == 1 ? 'readonly' : ''); ?>  type="text" maxlength="50" required id="plan" name="plan" placeholder="ระบุชื่อการอบรม"> </div>
                                 <div class="col-sm-6 flex-column d-flex">
                                     <label class="form-control-label px-3 pb-1">เลือกหน่วยงาน<span class="text-danger"> *</span></label>
-                                    <select required name="level" class="form-control select2" style="width: 100%; padding: 8px 15px; font-size: 18px; margin-top: 5px; height: 50px;">
+                                    <?php if ($projectAdminCreate == 1) { ?>
+                                    <input type="hidden" name="level" value="<?php echo $projectLevel; ?>" />
+                                   <?php } ?>
+                                    <select required name="level"  <?php echo ($projectAdminCreate == 1 ? 'disabled' : ''); ?>  class="form-control select2" style="width: 100%; padding: 8px 15px; font-size: 18px; margin-top: 5px; height: 50px;">
                                         <option value="" disabled selected>เลือกหน่วยงาน</option>
                                         <?php
                                         $sql = "SELECT or_id, or_name FROM organization";
@@ -269,11 +272,14 @@ $userId = $_SESSION['userId']
                             </div>
                             <div class="row justify-content-between text-left p-4">
                                 <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">วันที่จัดอบรม<span class="text-danger"> *</span></label>
-                                    <input type="datetime-local" name="date" placeholder="เลือกวันที่">
+                                    <input  <?php echo ($projectAdminCreate == 1 ? 'disabled' : ''); ?>  type="datetime-local" name="date" placeholder="เลือกวันที่">
+                                    <?php if ($projectAdminCreate == 1) {
+                                        echo '<input type="hidden" name="date" value="' . $projectDeadline . '" />';
+                                     } ?>
                                 </div>
 
                                 <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">รายละเอียดการอบรม<span class="text-danger"> *</span></label>
-                                    <input type="file" name="newPdfFile" accept=".pdf" />
+                                    <input <?php echo ($projectAdminCreate == 1 ? 'disabled' : ''); ?> type="file" name="newPdfFile" accept=".pdf" />
                                 </div>
                             </div>
 
@@ -316,7 +322,7 @@ $userId = $_SESSION['userId']
                                 </div>
                                
                                 <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3 pb-1">ข้อมูลเพิ่มเติม<span class="text-danger"> *</span></label>
-                                    <textarea name="description" id="" cols="30" rows="4"><?php echo  $projectDescription ?> </textarea>
+                                    <textarea  <?php echo ($projectAdminCreate == 1 ? 'readonly' : ''); ?>  name="description" id="" cols="30" rows="4"><?php echo  $projectDescription ?> </textarea>
                                 </div>
                             </div>
                           

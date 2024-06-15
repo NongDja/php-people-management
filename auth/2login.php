@@ -17,7 +17,6 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
         exit();
     }
     
-    // Use prepared statement to avoid SQL injection
     $sql = "SELECT user_auth.*, members.image_data, role_user.role_id 
             FROM user_auth 
             JOIN members ON user_auth.userId = members.id
@@ -26,7 +25,6 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
     
     $stmt = mysqli_prepare($con, $sql);
     
-    // แก้ไขบรรทัดนี้
     mysqli_stmt_bind_param($stmt, "ss", $user, $user);
     
     mysqli_stmt_execute($stmt);
@@ -34,13 +32,10 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
     $rowcount = mysqli_num_rows($result);
 
     if ($rowcount == 1) {
-        //fetch to get the desired columns
         $row = mysqli_fetch_array($result);
         $hashedPassword = $row['password'];
         $verifyPassword = password_verify($enteredPassword, $hashedPassword);
-        // Verify the entered password against the stored hashed password
         if ($verifyPassword) {
-            // Passwords match, login success
             $_SESSION["username"] = $row['username'];
             $_SESSION["userId"] = $row["userId"];
             $_SESSION["role"] = $row['role_id'];
@@ -54,13 +49,12 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
                     text: "เข้าสู่ระบบสำเร็จ",
                     type: "success",
                 }, function() {
-                    window.location = "../page/home.php"; //หน้าที่ต้องการให้กระโดดไป
+                    window.location = "../page/home.php"; 
                 });
             }, 500);
             </script>';
         } 
         else {
-            // Incorrect password
             session_destroy();
             echo '<script>
             setTimeout(function() {
@@ -69,13 +63,13 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
                     text: "Username หรือ Password ไม่ถูกต้อง ลองใหม่อีกครั้ง",
                     type: "warning"
                 }, function() {
-                    window.location = "login.php"; //หน้าที่ต้องการให้กระโดดไป
+                    window.location = "login.php"; 
                 });
             }, 500);
             </script>';
         }
-    } else {
-        // Username not found
+    }
+     else {
         session_destroy();
         echo '<script>
         setTimeout(function() {

@@ -355,11 +355,11 @@ $userId = $_SESSION['userId']
                         <div class="row">
 
                             <div class="col-6 ">
-                                <h3> <?php if ($_SESSION['role'] != 3) {
+                                <h3> <?php if ($_SESSION['role'] != 2) {
                                             echo 'แผนงาน';
                                         } else {
                                             echo 'แผนงานของฉัน';
-                                        } ?> <a style="font-size: 14px;" href="<?php if ($_SESSION['role'] != 3) {
+                                        } ?> <a style="font-size: 14px;" href="<?php if ($_SESSION['role'] != 2) {
                                                                                     echo '../plan/plan_add.php';
                                                                                 } else {
                                                                                     echo '../plan/self_add.php';
@@ -416,7 +416,7 @@ $userId = $_SESSION['userId']
 
                     $id = $_SESSION["userId"];
                     $con = mysqli_connect($servername, $username, $password, $dbname);
-                    if ($_SESSION['role'] != 3) {
+                    if ($_SESSION['role'] != 2) {
                         $sql = "SELECT DISTINCT project.project_id, 
                         (SELECT COUNT(DISTINCT project_user.project_id) FROM project_user) AS projectCount, 
                         project.*, organization.or_name 
@@ -462,7 +462,7 @@ $userId = $_SESSION['userId']
 
 
                     if (mysqli_num_rows($result) > 0) {
-                        if ($_SESSION['role'] != 3) {
+                        if ($_SESSION['role'] != 2) {
                             $queryCount = "SELECT COUNT(DISTINCT project.project_id) AS total 
                             FROM project 
                             JOIN project_user ON project_user.project_id = project.project_id
@@ -539,10 +539,10 @@ $userId = $_SESSION['userId']
                                             </a>
 
                                             <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                                <li><a class="dropdown-item" href="<?php if ($_SESSION['role'] != 3) { ?>../plan/plan_edit.php?page=<?php echo $projectId;
+                                                <li><a class="dropdown-item" href="<?php if ($_SESSION['role'] != 2) { ?>../plan/plan_edit.php?page=<?php echo $projectId;
                                                                                                                                                 } else { ?>../plan/self_edit.php?page=<?php echo $projectId;
                                                                                                                                                                                     } ?>">แก้ไข</a></li>
-                                                <?php if ($_SESSION['role'] != 3) { ?>
+                                                <?php if ($_SESSION['role'] != 2) { ?>
                                                     <li><a class="dropdown-item" onclick="confirmDelete(<?php echo $projectId; ?>)">ลบ</a></li>
                                                 <?php    }
                                                 ?>

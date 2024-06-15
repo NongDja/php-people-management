@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <?php
-include "../auth/checklogin.php";
+include "../auth/checkuser.php";
 $userId = $_SESSION["userId"];
 ?>
 <html lang="en">

@@ -16,7 +16,7 @@ $role = isset($_POST["role"]) ? $_POST["role"] : null;
 $pwd = isset($_POST["password"]) ? $_POST["password"] : null;
 $repwd = isset($_POST["repassword"]) ? $_POST["repassword"] : null;
 $branch = isset($_POST["branch"]) ? $_POST["branch"] : null;
-$defaultRoleId = 3;
+$defaultRoleId = 2;
 
 if ($image_name <> "") {
     $image_data = addslashes(file_get_contents($_FILES["myfile"]["tmp_name"]));
@@ -59,7 +59,6 @@ if ($pwd != null && $repwd != null && $pwd === $repwd) {
     ];
     $hashedPassword = password_hash($pwd, PASSWORD_BCRYPT, $options);
     
-    // Update password in user_auth table
     $sql3 = "UPDATE user_auth SET password = ? WHERE userId = ?";
     $stmt3 = mysqli_prepare($conn, $sql3);
     if ($stmt3) {

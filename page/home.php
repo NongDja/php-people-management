@@ -27,7 +27,6 @@
 
         .timeline-widget {
             max-height: 600px;
-            /* Adjust the maximum height as needed */
             overflow-y: auto;
         }
     </style>
@@ -56,15 +55,17 @@
                 die("error" . mysqli_connect_error());
             }
             $currentDate = date('Y-m-d');
+
             if (isset($_SESSION['role'])) {
                 $id = $_SESSION['userId'];
+                $sql = "";
                 if ($_SESSION['role'] == 1) {
                     $sql = "SELECT *
                     FROM project
                     WHERE deadline >= CURDATE() AND deadline <= DATE_ADD(CURDATE(), INTERVAL 1 MONTH)
                     ORDER BY deadline ASC;
                     ";
-                } else if ($_SESSION['role'] == 3) {
+                } else if ($_SESSION['role'] == 2) {
                     $sql = "SELECT project.*
                 FROM project
                 INNER JOIN project_user ON project.project_id = project_user.project_id
@@ -73,14 +74,24 @@
                 ORDER BY deadline ASC;";
                 }
 
-                $result = mysqli_query($conn, $sql);
+                if (!empty($sql)) {
+                    $result = mysqli_query($conn, $sql);
+                    if ($result) {
+                    } else {
+                        echo "Error executing query: " . mysqli_error($conn);
+                    }
+                } else {
+                    echo "Invalid role or no query to execute.";
+                }
+            } else {
+                echo "Role is not set in the session.";
             }
+        
 
 
 
             $borderClass = 'border-primary';
 
-            // Check status and update border class accordingly
 
             ?>
             <div class="container-fluid">
@@ -88,7 +99,8 @@
                     <div class="row">
                         <div class="col-lg-4 d-flex align-items-stretch">
                             <div class="card w-100">
-                                <div class="card-body p-4">
+                                <?php if (!empty($result)) { ?>
+                                    <div class="card-body p-4">
                                     <div class="mb-4">
                                         <h5 class="card-title fw-semibold">Upcoming Timeline</h5>
                                     </div>
@@ -128,6 +140,8 @@
                                         } ?>
                                     </ul>
                                 </div>
+                                    <?php } ?>
+                                
                             </div>
                         </div>
                         <div class="content col-lg-8 p-0">
@@ -196,7 +210,7 @@
                 plugins: ['interaction', 'dayGrid'],
                 defaultDate: '<?php echo $currentDate; ?>',
                 // editable: true,
-                eventLimit: true, // allow "more" link when too many events
+                eventLimit: true, 
                 events: <?php echo $eventsJson; ?>,
             });
 
