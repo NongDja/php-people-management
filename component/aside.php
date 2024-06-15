@@ -114,10 +114,14 @@
             </li> -->
           <?php   } ?>
         </ul>
-
+        <div class="sidebar-footer" style="margin-bottom: 50px; padding : 10px; background: #f8f9fa; position: absolute; bottom: 0; left: 0; width: 100%;">
+        <span>Developed by</span><br>
+        <span>nongdforwork@gmail.com</span>
+    </div>
       </nav>
       <!-- End Sidebar navigation -->
     </div>
+ 
     <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
     <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../assets/js/sidebarmenu.js"></script>
